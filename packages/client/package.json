@@ -1,0 +1,15 @@
+{
+  "name": "@0auth/client",
+  "version": "0.0.1",
+  "main": "./src/index.js",
+  "description": "A client library for 0Auth",
+  "repository": "https://github.com/0-Auth/0Auth.git",
+  "author": "0Auth Team",
+  "keywords": [
+    "authenticate",
+    "0Auth",
+    "client"
+  ],
+  "license": "MIT",
+  "private": false
+}

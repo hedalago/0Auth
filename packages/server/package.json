@@ -1,0 +1,16 @@
+{
+  "name": "@0auth/server",
+  "version": "0.0.1",
+  "main": "./src/index.js",
+  "description": "A server library for 0Auth",
+  "repository": "https://github.com/0-Auth/0Auth.git",
+  "author": "0Auth Team",
+  "keywords": [
+    "authenticate",
+    "verification",
+    "0Auth",
+    "server"
+  ],
+  "license": "MIT",
+  "private": false
+}
