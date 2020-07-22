@@ -1,0 +1,16 @@
+{
+  "name": "@0auth/message",
+  "version": "0.0.1",
+  "main": "./src/index.js",
+  "description": "A message library for 0Auth",
+  "repository": "https://github.com/0-Auth/0Auth.git",
+  "author": "0Auth Team",
+  "keywords": [
+    "authenticate",
+    "credential",
+    "0Auth",
+    "message"
+  ],
+  "license": "MIT",
+  "private": false
+}

@@ -26,3 +26,6 @@ yarn.lock
 .idea/
 out/
 .idea_modules/
+
+# TypeScript
+**/*.js

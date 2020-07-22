@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2015",
+    "lib": ["es5", "es2015", "dom"],
+    "strict": true,
+    "baseUrl": "./packages",
+    "rootDir": "./packages",
+    "paths": {
+       "@0auth/client": ["./packages/client/src"],
+       "@0auth/message": ["./packages/message/src"],
+       "@0auth/server": ["./packages/server/src"],
+       "test": ["./test/*"]
+     },
+    "declaration": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules/*",
+    "**/build/*"
+  ]
+}

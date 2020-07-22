@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "private": true,
+  "author": "0Auth Team",
+  "keywords": ["0Auth"],
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.9.7"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
