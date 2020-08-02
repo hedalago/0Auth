@@ -5,6 +5,7 @@ export enum PropertyType {
 
 export type Property = {
   type: PropertyType;
+  key: string;
   value: string;
 }
 
