@@ -4,19 +4,22 @@
     "module": "ES2015",
     "lib": ["es5", "es2015", "dom"],
     "strict": true,
-    "baseUrl": "./packages",
-    "rootDir": "./packages",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "lib",
     "paths": {
-       "@0auth/client": ["./packages/client/src"],
-       "@0auth/message": ["./packages/message/src"],
-       "@0auth/server": ["./packages/server/src"],
-       "test": ["./test/*"]
+       "@0auth/*": ["packages/*/src"]
      },
     "declaration": true,
-    "skipLibCheck": true
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
   },
   "exclude": [
     "node_modules/*",
-    "**/build/*"
+    "lib/*",
+    "**/*.spec.ts"
   ]
 }

@@ -29,3 +29,7 @@ out/
 
 # TypeScript
 **/*.js
+lib/
+
+# Testing
+.nyc_output/
