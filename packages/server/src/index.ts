@@ -1,4 +1,4 @@
-import {KeyType, Property, Signature} from "../../message/src/index";
+import {KeyType, Property, Signature} from "@0auth/message";
 
 type SecretKey = {
   type: KeyType;

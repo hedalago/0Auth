@@ -12,5 +12,8 @@
     "server"
   ],
   "license": "MIT",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "@0auth/message": "^0.0.1"
+  }
 }
