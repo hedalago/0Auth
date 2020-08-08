@@ -7,7 +7,7 @@ export type Property = {
   type: PropertyType;
   key: string;
   value: string;
-}
+};
 
 export enum AuthType {
   Privacy,
@@ -24,4 +24,4 @@ export type Signature = {
   authType: AuthType;
   keyType: KeyType;
   value: string;
-}
+};

@@ -4,12 +4,12 @@ import {getMerkleRoot, hashProperty, signAccordingToKeyType, verifyAccordingToKe
 type SecretKey = {
   type: KeyType;
   key: string;
-}
+};
 
 type PublicKey = {
   type: KeyType;
   key: string;
-}
+};
 
 export function authPrivacy(properties: Property[], secret: SecretKey): Signature {
   const hashes = properties.map(property => hashProperty(property)),
@@ -19,7 +19,10 @@ export function authPrivacy(properties: Property[], secret: SecretKey): Signatur
 
 // TODO: @ts-ignore should be removed, when below function is implemented.
 // @ts-ignore
-export function authPackage(properties: Property[], secret: SecretKey): Signature {
+export function authPackage(
+  properties: Property[],
+  secret: SecretKey
+): Signature {
   // TODO: Not implemented yet.
 }
 
@@ -34,6 +37,10 @@ export function verifyPrivacy(properties: Property[], sign: Signature, publicKey
 
 // TODO: @ts-ignore should be removed, when below function is implemented.
 // @ts-ignore
-export function verifyPackage(properties: Property[], sign: Signature, publicKey: PublicKey): boolean {
+export function verifyPackage(
+  properties: Property[],
+  sign: Signature,
+  publicKey: PublicKey
+): boolean {
   // TODO: Not implemented yet.
 }
