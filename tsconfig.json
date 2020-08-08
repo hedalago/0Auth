@@ -15,7 +15,8 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "node"
   },
   "exclude": ["node_modules/*", "lib/*", "**/*.spec.ts"]
 }
