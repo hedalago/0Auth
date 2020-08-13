@@ -13,6 +13,13 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@0auth/message": "^0.0.1"
+    "@0auth/message": "^0.0.1",
+    "crypto-js": "^4.0.0"
+  },
+  "devDependencies": {
+    "@0auth/server": "^0.0.1",
+    "elliptic": "^6.5.3",
+    "@types/crypto-js": "^3.1.47",
+    "@types/elliptic": "^6.4.12"
   }
 }
