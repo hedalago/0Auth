@@ -1,5 +1,14 @@
-import {AuthType, KeyType, Property, Signature} from "@0auth/message";
-import {getMerkleRoot, hashProperty, signAccordingToKeyType, verifyAccordingToKeyType} from "./utils";
+import {
+  AuthType, KeyType, Property, Signature,
+} from '@0auth/message';
+import {
+  getMerkleRoot,
+  hash,
+  hashProperty,
+  signAccordingToKeyType,
+  utf8ToBase64,
+  verifyAccordingToKeyType,
+} from './utils';
 
 type SecretKey = {
   type: KeyType;
@@ -11,36 +20,47 @@ type PublicKey = {
   key: string;
 };
 
-export function authPrivacy(properties: Property[], secret: SecretKey): Signature {
-  const hashes = properties.map(property => hashProperty(property)),
-    merkleRoot = getMerkleRoot(hashes);
+export function authPrivacy(
+  properties: Property[],
+  secret: SecretKey,
+): Signature {
+  const hashes = properties.map((property) => hashProperty(property));
+  const merkleRoot = getMerkleRoot(hashes);
   return signAccordingToKeyType(merkleRoot, secret.key, secret.type);
 }
 
-// TODO: @ts-ignore should be removed, when below function is implemented.
-// @ts-ignore
 export function authPackage(
   properties: Property[],
-  secret: SecretKey
+  secret: SecretKey,
 ): Signature {
-  // TODO: Not implemented yet.
+  const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
+  const hashValue = hash(encodings.join(','));
+  return signAccordingToKeyType(hashValue, secret.key, secret.type);
 }
 
-export function verifyPrivacy(properties: Property[], sign: Signature, publicKey: PublicKey): boolean {
-  if (sign.authType !== AuthType.Privacy || sign.keyType !== publicKey.type)
-    return false;
+export function verifyPrivacy(
+  properties: Property[],
+  sign: Signature,
+  publicKey: PublicKey,
+): boolean {
+  if (sign.authType !== AuthType.Privacy || sign.keyType !== publicKey.type) return false;
 
-  const hashes = properties.map(property => hashProperty(property)),
-    merkleRoot = getMerkleRoot(hashes);
-  return verifyAccordingToKeyType(merkleRoot, sign.value, publicKey.key, publicKey.type);
+  const hashes = properties.map((property) => hashProperty(property));
+  const merkleRoot = getMerkleRoot(hashes);
+  return verifyAccordingToKeyType(
+    merkleRoot,
+    sign.value,
+    publicKey.key,
+    publicKey.type,
+  );
 }
 
-// TODO: @ts-ignore should be removed, when below function is implemented.
-// @ts-ignore
 export function verifyPackage(
   properties: Property[],
   sign: Signature,
-  publicKey: PublicKey
+  publicKey: PublicKey,
 ): boolean {
-  // TODO: Not implemented yet.
+  const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
+  const hashValue = hash(encodings.join(','));
+  return verifyAccordingToKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
 }
