@@ -3,8 +3,10 @@ import {
 } from '@0auth/message';
 import {
   getMerkleRoot,
+  hash,
   hashProperty,
   signAccordingToKeyType,
+  utf8ToBase64,
   verifyAccordingToKeyType,
 } from './utils';
 
@@ -30,10 +32,10 @@ export function authPrivacy(
 export function authPackage(
   properties: Property[],
   secret: SecretKey,
-  // TODO: @ts-ignore should be removed, when below function is implemented.
-  // @ts-ignore
 ): Signature {
-  // TODO: Not implemented yet.
+  const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
+  const hashValue = hash(encodings.join(','));
+  return signAccordingToKeyType(hashValue, secret.key, secret.type);
 }
 
 export function verifyPrivacy(
@@ -57,8 +59,8 @@ export function verifyPackage(
   properties: Property[],
   sign: Signature,
   publicKey: PublicKey,
-  // TODO: @ts-ignore should be removed, when below function is implemented.
-  // @ts-ignore
 ): boolean {
-  // TODO: Not implemented yet.
+  const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
+  const hashValue = hash(encodings.join(','));
+  return verifyAccordingToKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
 }
