@@ -1,8 +1,10 @@
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiHttp from 'chai-http';
+import chaiAsPromised from 'chai-as-promised';
 import { ec as ECDSA } from 'elliptic';
 import { KeyType, Property, PropertyType } from '@0auth/message';
 import { authPrivacy } from '@0auth/server';
-import { getSignature, storeSignature } from '../src';
+import { getSignature, storeSignature, registerInfo } from '../src';
 import {
   DataType,
   decryptMessage,
@@ -22,6 +24,9 @@ function mockStorage() {
     clear: () => (storage = {}),
   };
 }
+
+use(chaiHttp);
+use(chaiAsPromised);
 
 describe('test utils', () => {
   if (global.localStorage === undefined) {
@@ -98,5 +103,23 @@ describe('test store localStorage', () => {
     expect(storageData).to.be.not.null;
     expect(storageData.properties).to.be.deep.equal(properties);
     expect(storageData.sign).to.be.deep.equal(sign);
+  });
+});
+
+describe('test register information', () => {
+  const properties: Property[] = [
+    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
+    { key: 'age', type: PropertyType.Raw, value: '17' },
+    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+  ];
+  it('test Error when transferred wrong URL', () => {
+    const wrongUrl = 'http:/server.com';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    expect(registerInfo(wrongUrl, properties)).to.be.rejectedWith(Error);
+  });
+  it('test Error when server error occurred', () => {
+    const serverErrorUrl = 'https://github.com/wrong/path';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    expect(registerInfo(serverErrorUrl, properties)).to.be.rejectedWith(Error);
   });
 });
