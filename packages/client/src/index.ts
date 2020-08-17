@@ -1,7 +1,9 @@
 import { Property, Signature } from '@0auth/message';
+import axios from 'axios';
 import {
   DataType,
-  encryptMessage, getDecryptedMessage,
+  encryptMessage,
+  getDecryptedMessage,
   getGeneratedRawKey,
   StorageType,
   storeData,
@@ -10,15 +12,23 @@ import {
 export type DecryptedMessage = {
   properties: Property[];
   sign: Signature;
-}
+};
 
 export async function registerInfo(
-  url: string,
+  requestUrl: string,
   properties: Property[],
-  // TODO: @ts-ignore should be removed, when below function is implemented.
-  // @ts-ignore
 ): Promise<Signature> {
-  // TODO: Not implemented yet.
+  const regex = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+  if (!regex.test(requestUrl)) {
+    throw new Error('The requestUrl is not validated one. Please check your URL.');
+  }
+  const response = await axios.post(requestUrl, { properties });
+  if (!response.status.toString().startsWith('2')) {
+    throw new Error('Something went wrong. Please make sure API path was clear or server-side function was implemented.');
+  }
+  const signature = response.data as Signature;
+
+  return signature;
 }
 
 export function storeSignature(
