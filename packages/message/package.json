@@ -12,5 +12,12 @@
     "message"
   ],
   "license": "MIT",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "@0auth/message": "^0.0.1",
+    "crypto-js": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^3.1.47"
+  }
 }

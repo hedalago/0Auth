@@ -1,4 +1,5 @@
-import { AES, enc, SHA256 } from 'crypto-js';
+import { AES, enc } from 'crypto-js';
+import { hash } from '@0auth/message';
 
 export enum StorageType {
   LocalStorage,
@@ -22,7 +23,7 @@ export function decryptMessage(encryptedMessage: string, key: string): string {
 export function generateRandomKey(): string {
   const random = (Math.random() * 100000000).toString();
   const date = new Date().toString();
-  return SHA256(random + date).toString();
+  return hash(random + date);
 }
 
 export function dataTypeToString(dataType: DataType): string {
@@ -75,7 +76,6 @@ export function getGeneratedRawKey(
   const newKey = generateRandomKey();
   if (password !== undefined) storeData(encryptMessage(newKey, password), DataType.Key, storage);
   else storeData(newKey, DataType.Key, storage);
-
   return newKey;
 }
 
