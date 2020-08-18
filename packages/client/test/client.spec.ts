@@ -2,9 +2,13 @@ import { expect, use } from 'chai';
 import chaiHttp from 'chai-http';
 import chaiAsPromised from 'chai-as-promised';
 import { ec as ECDSA } from 'elliptic';
-import { KeyType, Property, PropertyType } from '@0auth/message';
-import { authPrivacy } from '@0auth/server';
-import { getSignature, storeSignature, registerInfo } from '../src';
+import {
+  hashProperty, KeyType, Property, PropertyType,
+} from '@0auth/message';
+import { authPrivacy, verifyPrivacy } from '@0auth/server';
+import {
+  getSignature, hideProperty, registerInfo, storeSignature,
+} from '../src';
 import {
   DataType,
   decryptMessage,
@@ -89,7 +93,7 @@ describe('test store localStorage', () => {
     localStorage.clear();
   });
   it('test storing signature in localStorage not using password', () => {
-    expect(getSignature(StorageType.LocalStorage, 'abc')).to.be.null;
+    expect(getSignature(StorageType.LocalStorage)).to.be.null;
     storeSignature(properties, sign, StorageType.LocalStorage);
     const storageData = getSignature(StorageType.LocalStorage);
     expect(storageData).to.be.not.null;
@@ -121,5 +125,37 @@ describe('test register information', () => {
     const serverErrorUrl = 'https://github.com/wrong/path';
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     expect(registerInfo(serverErrorUrl, properties)).to.be.rejectedWith(Error);
+  });
+});
+
+describe('test hide property', () => {
+  const properties: Property[] = [
+    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
+    { key: 'age', type: PropertyType.Raw, value: '17' },
+    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+  ];
+
+  it('test hide property value', () => {
+    const partiallyHiddenProperties = hideProperty(properties, ['name', 'address']);
+    expect(partiallyHiddenProperties[0].type).to.be.equal(PropertyType.Hash);
+    expect(partiallyHiddenProperties[0].key).to.be.equal('name');
+    expect(partiallyHiddenProperties[0].value).to.be.equal(hashProperty(properties[0]));
+    expect(partiallyHiddenProperties[2].type).to.be.equal(PropertyType.Hash);
+    expect(partiallyHiddenProperties[2].key).to.be.equal('address');
+    expect(partiallyHiddenProperties[2].value).to.be.equal(hashProperty(properties[2]));
+
+    expect(partiallyHiddenProperties[1].type).to.be.equal(PropertyType.Raw);
+    expect(partiallyHiddenProperties[1].key).to.be.equal('age');
+    expect(partiallyHiddenProperties[1].value).to.be.equal(properties[1].value);
+  });
+  it('test hidden property verification', () => {
+    const ecdsa = new ECDSA('secp256k1');
+    const key = ecdsa.keyFromPrivate(
+      '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a',
+    );
+    const sign = authPrivacy(properties, { key: key.getPrivate('hex'), type: KeyType.ECDSA });
+    const publicKey = { key: key.getPublic('hex'), type: KeyType.ECDSA };
+    const partiallyHiddenProperties = hideProperty(properties, ['name', 'address']);
+    expect(verifyPrivacy(partiallyHiddenProperties, sign, publicKey)).to.be.equal(true);
   });
 });

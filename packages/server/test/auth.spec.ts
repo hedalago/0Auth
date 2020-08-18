@@ -1,34 +1,16 @@
 import { expect } from 'chai';
-import { KeyType, Property, PropertyType } from '@0auth/message';
+import {
+  hashProperty, KeyType, Property, PropertyType,
+} from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 import {
   authPackage, authPrivacy, verifyPackage, verifyPrivacy,
 } from '../src';
 import {
-  getMerkleRoot, hash, hashProperty, utf8ToBase64, verifyAccordingToKeyType,
+  getMerkleRoot, verifyByKeyType,
 } from '../src/utils';
 
-describe('test utils', () => {
-  it('test utf8 to base64', () => {
-    expect(utf8ToBase64('ABC')).to.be.equal('QUJD');
-    expect(utf8ToBase64('서울')).to.be.equal('JUVDJTg0JTlDJUVDJTlBJUI4');
-  });
-  it('test hash property', () => {
-    const property1: Property = { key: 'a,b', type: PropertyType.Raw, value: 'c' };
-    const property2: Property = { key: 'a', type: PropertyType.Raw, value: 'b,c' };
-    const property3: Property = {
-      key: '',
-      type: PropertyType.Hash,
-      value: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
-    };
-
-    expect(hashProperty(property1)).to.be.equal('2e832436ce5b19a381949a13547469604758fd5e0001206f8a6cf0ed7974145a');
-    expect(hashProperty(property1)).to.be.not.equal(hashProperty(property2));
-    expect(hashProperty(property3)).to.be.equal(hashProperty(property3));
-  });
-  it('test hash', () => {
-    expect(hash('abc')).to.be.equal('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
-  });
+describe('test server utils', () => {
   it('test merkle root', () => {
     const properties = Array.from(Array(100).keys())
       .map((index) => ({ type: PropertyType.Raw, key: `key${index}`, value: `value${index}` }))
@@ -53,8 +35,8 @@ describe('test privacy mode authentication', () => {
 
     expect(key1.verify(merkleRoot, sign.value)).to.be.equal(true);
     expect(key2.verify(merkleRoot, sign.value)).to.be.equal(false);
-    expect(verifyAccordingToKeyType(merkleRoot, sign.value, key1.getPublic('hex'), KeyType.ECDSA)).to.be.equal(true);
-    expect(verifyAccordingToKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.ECDSA)).to.be.equal(false);
+    expect(verifyByKeyType(merkleRoot, sign.value, key1.getPublic('hex'), KeyType.ECDSA)).to.be.equal(true);
+    expect(verifyByKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.ECDSA)).to.be.equal(false);
     expect(verifyPrivacy(properties, sign, { key: key1.getPublic('hex'), type: KeyType.ECDSA })).to.be.equal(true);
     expect(verifyPrivacy(properties, sign, { key: key2.getPublic('hex'), type: KeyType.ECDSA })).to.be.equal(false);
   });
@@ -68,8 +50,8 @@ describe('test privacy mode authentication', () => {
 
     expect(key1.verify(merkleRoot, sign.value)).to.be.equal(true);
     expect(key2.verify(merkleRoot, sign.value)).to.be.equal(false);
-    expect(verifyAccordingToKeyType(merkleRoot, sign.value, key1.getPublic('hex'), KeyType.EDDSA)).to.be.equal(true);
-    expect(verifyAccordingToKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.EDDSA)).to.be.equal(false);
+    expect(verifyByKeyType(merkleRoot, sign.value, key1.getPublic('hex'), KeyType.EDDSA)).to.be.equal(true);
+    expect(verifyByKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.EDDSA)).to.be.equal(false);
     expect(verifyPrivacy(properties, sign, { key: key1.getPublic('hex'), type: KeyType.EDDSA })).to.be.equal(true);
     expect(verifyPrivacy(properties, sign, { key: key2.getPublic('hex'), type: KeyType.EDDSA })).to.be.equal(false);
   });
@@ -83,7 +65,7 @@ describe('test privacy mode authentication', () => {
     const sign = authPrivacy(properties, { key: key1.getPrivate('hex'), type: KeyType.ECDSA });
 
     expect(() => key2.verify(merkleRoot, sign.value)).to.throw('Assertion failed');
-    expect(() => verifyAccordingToKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.EDDSA)).to.throw('Assertion failed');
+    expect(() => verifyByKeyType(merkleRoot, sign.value, key2.getPublic('hex'), KeyType.EDDSA)).to.throw('Assertion failed');
     expect(verifyPrivacy(properties, sign, { key: key2.getPublic('hex'), type: KeyType.EDDSA })).to.be.equal(false);
   });
   it('test if properties are different', () => {

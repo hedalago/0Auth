@@ -1,13 +1,10 @@
 import {
-  AuthType, KeyType, Property, Signature,
+  AuthType, hash, hashProperty, KeyType, Property, Signature, utf8ToBase64,
 } from '@0auth/message';
 import {
   getMerkleRoot,
-  hash,
-  hashProperty,
-  signAccordingToKeyType,
-  utf8ToBase64,
-  verifyAccordingToKeyType,
+  signByKeyType,
+  verifyByKeyType,
 } from './utils';
 
 type SecretKey = {
@@ -26,7 +23,7 @@ export function authPrivacy(
 ): Signature {
   const hashes = properties.map((property) => hashProperty(property));
   const merkleRoot = getMerkleRoot(hashes);
-  return signAccordingToKeyType(merkleRoot, secret.key, secret.type);
+  return signByKeyType(merkleRoot, secret.key, secret.type);
 }
 
 export function authPackage(
@@ -35,7 +32,7 @@ export function authPackage(
 ): Signature {
   const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
   const hashValue = hash(encodings.join(','));
-  return signAccordingToKeyType(hashValue, secret.key, secret.type);
+  return signByKeyType(hashValue, secret.key, secret.type);
 }
 
 export function verifyPrivacy(
@@ -47,7 +44,7 @@ export function verifyPrivacy(
 
   const hashes = properties.map((property) => hashProperty(property));
   const merkleRoot = getMerkleRoot(hashes);
-  return verifyAccordingToKeyType(
+  return verifyByKeyType(
     merkleRoot,
     sign.value,
     publicKey.key,
@@ -62,5 +59,5 @@ export function verifyPackage(
 ): boolean {
   const encodings = properties.map((property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
   const hashValue = hash(encodings.join(','));
-  return verifyAccordingToKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
+  return verifyByKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
 }
