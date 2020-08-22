@@ -1,8 +1,8 @@
 import sha256 from 'crypto-js/sha256';
 
 export enum PropertyType {
-  Raw,
-  Hash,
+  Raw = 'RAW',
+  Hash = 'HASH',
 }
 
 export type Property = {
@@ -12,14 +12,14 @@ export type Property = {
 };
 
 export enum AuthType {
-  Privacy,
-  Package,
-  Local,
+  Privacy = 'PRIVACY',
+  Package = 'PACKAGE',
+  Local = 'LOCAL',
 }
 
 export enum KeyType {
-  EDDSA,
-  ECDSA,
+  EDDSA = 'EDDSA',
+  ECDSA = 'ECDSA',
 }
 
 export type Signature = {
