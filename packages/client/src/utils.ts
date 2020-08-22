@@ -2,14 +2,14 @@ import { AES, enc } from 'crypto-js';
 import { hash } from '@0auth/message';
 
 export enum StorageType {
-  LocalStorage,
-  IndexedDB,
-  ChromeExtension,
+  LocalStorage = 'LOCAL_STORAGE',
+  IndexedDB = 'INDEXED_DB',
+  ChromeExtension = 'CHROME_EXTENSION',
 }
 
 export enum DataType {
-  Key,
-  Message
+  Key = 'KEY',
+  Message = 'MESSAGE'
 }
 
 export function encryptMessage(message: string, key: string): string {

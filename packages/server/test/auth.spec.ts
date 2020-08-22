@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import {
-  hashProperty, KeyType, Property, PropertyType,
+  hashProperty, KeyType, Property, PropertyType, AuthType,
 } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 import {
-  authPackage, authPrivacy, verifyPackage, verifyPrivacy,
+  authPackage, authPrivacy, verifyPackage, verifyPrivacy, signRegister,
 } from '../src';
 import {
   getMerkleRoot, verifyByKeyType,
@@ -89,16 +89,16 @@ describe('test privacy mode authentication', () => {
     expect(sign1).to.be.not.equal(sign2);
   });
   it('should Korean property', () => {
-    const properties: Property[] = [
+    const properties2: Property[] = [
       { key: '이름', type: PropertyType.Raw, value: '김' },
       { key: '나이', type: PropertyType.Raw, value: '25' },
       { key: '주소', type: PropertyType.Raw, value: '서울' },
     ];
     const ecdsa = new ECDSA('secp256k1');
     const key = ecdsa.keyFromPrivate('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
-    const sign = authPrivacy(properties, { key: key.getPrivate('hex'), type: KeyType.ECDSA });
+    const sign = authPrivacy(properties2, { key: key.getPrivate('hex'), type: KeyType.ECDSA });
 
-    expect(verifyPrivacy(properties, sign, { key: key.getPublic('hex'), type: KeyType.ECDSA })).to.be.equal(true);
+    expect(verifyPrivacy(properties2, sign, { key: key.getPublic('hex'), type: KeyType.ECDSA })).to.be.equal(true);
   });
   it('test Signature verification without some value', () => {
     const properties2 = [
@@ -134,5 +134,60 @@ describe('test package mode authentication', () => {
     const sign = authPackage(properties, { key: key.getSecret('hex'), type: KeyType.EDDSA });
 
     expect(verifyPackage(properties, sign, { key: key.getPublic('hex'), type: KeyType.EDDSA })).to.be.equal(true);
+  });
+});
+
+describe('test signing register info', () => {
+  const properties: Property[] = [
+    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
+    { key: 'age', type: PropertyType.Raw, value: '17' },
+    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+  ];
+  it('test the successful case of registration of EdDSA', () => {
+    const eddsa = new EdDSA('ed25519');
+    const key = eddsa.keyFromSecret('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
+    const authKey = { key: key.getSecret('hex'), type: KeyType.EDDSA };
+    const verifyingKey = { key: key.getPublic('hex'), type: KeyType.EDDSA };
+
+    const sign = signRegister(properties)
+      .validate('name', (p) => p.length >= 2)
+      .validate('address', (p) => p.length >= 3)
+      .sign(authKey, AuthType.Privacy);
+
+    expect(verifyPrivacy(properties, sign, verifyingKey)).to.be.equal(true);
+  });
+  it('test the successful case of registration of ECDSA', () => {
+    const ecdsa = new ECDSA('secp256k1');
+    const key = ecdsa.keyFromPrivate('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
+    const authKey = { key: key.getPrivate('hex'), type: KeyType.ECDSA };
+    const verifyingKey = { key: key.getPublic('hex'), type: KeyType.ECDSA };
+
+    const sign = signRegister(properties)
+      .validate('name', (p) => p.length >= 2)
+      .validate('address', (p) => p.length >= 3)
+      .sign(authKey, AuthType.Privacy);
+
+    expect(verifyPrivacy(properties, sign, verifyingKey)).to.be.equal(true);
+  });
+  it('test the failure case of registration of EdDSA', () => {
+    const eddsa = new EdDSA('ed25519');
+    const key = eddsa.keyFromSecret('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
+    const authKey = { key: key.getSecret('hex'), type: KeyType.EDDSA };
+    expect(
+      signRegister(properties)
+        .validate('age', (v) => Number(v) >= 19)
+        .sign(authKey, AuthType.Privacy),
+    ).to.be.equal(null);
+  });
+  it('test the failure case of registration of ECDSA', () => {
+    const ecdsa = new ECDSA('secp256k1');
+    const key = ecdsa.keyFromPrivate('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
+    const authKey = { key: key.getPrivate('hex'), type: KeyType.ECDSA };
+
+    expect(
+      signRegister(properties)
+        .validate('age', (v) => Number(v) >= 19)
+        .sign(authKey, AuthType.Privacy),
+    ).to.be.equal(null);
   });
 });
