@@ -1,5 +1,5 @@
 import {
-  AuthType, hash, KeyType, Signature,
+  AuthType, hash, KeyType, Property, PropertyType, Signature,
 } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 
@@ -67,4 +67,19 @@ export function verifyByKeyType(
     default:
       throw new Error('Unreachable Code');
   }
+}
+
+export function propertyObject(properties: Property[]): { [key: string]: string } {
+  return properties.reduce(
+    (dict: { [key: string]: string }, property) => {
+      if (property.type !== PropertyType.Hash) {
+        return {
+          ...dict,
+          [property.key]: property.value,
+        };
+      }
+      return dict;
+    },
+    {},
+  );
 }
