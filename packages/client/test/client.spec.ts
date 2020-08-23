@@ -110,24 +110,6 @@ describe('test store localStorage', () => {
   });
 });
 
-describe('test register information', () => {
-  const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
-  ];
-  it('test Error when transferred wrong URL', () => {
-    const wrongUrl = 'http:/server.com';
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    expect(registerInfo(wrongUrl, properties)).to.be.rejectedWith(Error);
-  });
-  it('test Error when server error occurred', () => {
-    const serverErrorUrl = 'https://github.com/wrong/path';
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    expect(registerInfo(serverErrorUrl, properties)).to.be.rejectedWith(Error);
-  });
-});
-
 describe('test hide property', () => {
   const properties: Property[] = [
     { key: 'name', type: PropertyType.Raw, value: 'Kim' },

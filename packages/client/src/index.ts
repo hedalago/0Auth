@@ -11,23 +11,6 @@ export type DecryptedMessage = {
   sign: Signature;
 };
 
-export async function registerInfo(
-  requestUrl: string,
-  properties: Property[],
-): Promise<Signature> {
-  const regex = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-  if (!regex.test(requestUrl)) {
-    throw new Error('The requestUrl is not validated one. Please check your URL.');
-  }
-  const response = await axios.post(requestUrl, { properties });
-  if (!response.status.toString().startsWith('2')) {
-    throw new Error('Something went wrong. Please make sure API path was clear or server-side function was implemented.');
-  }
-  const signature = response.data as Signature;
-
-  return signature;
-}
-
 export function storeSignature(
   properties: Property[],
   sign: Signature,
