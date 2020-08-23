@@ -1,14 +1,9 @@
 import { expect } from 'chai';
-import {
-  hashProperty, KeyType, Property, PropertyType, AuthType,
-} from '@0auth/message';
+import { AuthType, hashProperty, KeyType, Property, PropertyType } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
-import {
-  authPackage, authPrivacy, verifyPackage, verifyPrivacy, signRegister,
-} from '../src';
-import {
-  getMerkleRoot, verifyByKeyType,
-} from '../src/utils';
+import { authPackage, authPrivacy, verifyProperty, authProperty, verifyPackage, verifyPrivacy } from '../src';
+import { getMerkleRoot, verifyByKeyType } from '../src/utils';
+import { hideProperty } from '../../client/src';
 
 describe('test server utils', () => {
   it('test merkle root', () => {
@@ -149,7 +144,7 @@ describe('test signing register info', () => {
     const authKey = { key: key.getSecret('hex'), type: KeyType.EDDSA };
     const verifyingKey = { key: key.getPublic('hex'), type: KeyType.EDDSA };
 
-    const sign = signRegister(properties)
+    const sign = authProperty(properties)
       .validate('name', (p) => p.length >= 2)
       .validate('address', (p) => p.length >= 3)
       .sign(authKey, AuthType.Privacy);
@@ -162,7 +157,7 @@ describe('test signing register info', () => {
     const authKey = { key: key.getPrivate('hex'), type: KeyType.ECDSA };
     const verifyingKey = { key: key.getPublic('hex'), type: KeyType.ECDSA };
 
-    const sign = signRegister(properties)
+    const sign = authProperty(properties)
       .validate('name', (p) => p.length >= 2)
       .validate('address', (p) => p.length >= 3)
       .sign(authKey, AuthType.Privacy);
@@ -174,7 +169,7 @@ describe('test signing register info', () => {
     const key = eddsa.keyFromSecret('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
     const authKey = { key: key.getSecret('hex'), type: KeyType.EDDSA };
     expect(
-      signRegister(properties)
+      authProperty(properties)
         .validate('age', (v) => Number(v) >= 19)
         .sign(authKey, AuthType.Privacy),
     ).to.be.equal(null);
@@ -185,9 +180,70 @@ describe('test signing register info', () => {
     const authKey = { key: key.getPrivate('hex'), type: KeyType.ECDSA };
 
     expect(
-      signRegister(properties)
+      authProperty(properties)
         .validate('age', (v) => Number(v) >= 19)
         .sign(authKey, AuthType.Privacy),
     ).to.be.equal(null);
+  });
+});
+
+describe('test receive info', () => {
+  const properties: Property[] = [
+    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
+    { key: 'age', type: PropertyType.Raw, value: '17' },
+    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+  ];
+  const eddsa = new EdDSA('ed25519');
+  const key = eddsa.keyFromSecret('2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a');
+  const secretKey = { key: key.getSecret('hex'), type: KeyType.EDDSA };
+  const publicKey = { key: key.getPublic('hex'), type: KeyType.EDDSA };
+
+  it('test receive property with Privacy mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Privacy);
+    // eslint-disable-next-line no-unused-expressions
+    expect(sign).to.be.not.null;
+    expect(verifyProperty(properties, sign, publicKey, AuthType.Privacy).confirm(true)).to.be.equal(true);
+  });
+  it('test validation with Privacy mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Privacy);
+    const res = verifyProperty(properties, sign, publicKey, AuthType.Privacy)
+      .validate('age', (age) => Number(age) >= 15)
+      .confirm({ token: true });
+    expect(res).to.be.deep.equal({ token: true });
+  });
+  it('test the failure case with Privacy mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Privacy);
+    const res = verifyProperty(properties, sign, publicKey, AuthType.Privacy)
+      .validate('address', (address) => address === 'Daejeon')
+      .confirm({ token: true });
+    expect(res).to.be.null;
+  });
+  it('test receive property with Package mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Package);
+    // eslint-disable-next-line no-unused-expressions
+    expect(sign).to.be.not.null;
+    expect(verifyProperty(properties, sign, publicKey, AuthType.Package).confirm(true)).to.be.equal(true);
+  });
+  it('test validation with Package mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Package);
+    const res = verifyProperty(properties, sign, publicKey, AuthType.Package)
+      .validate('age', (age) => Number(age) >= 15)
+      .confirm({ token: true });
+    expect(res).to.be.deep.equal({ token: true });
+  });
+  it('test the failure case with Package mode', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Package);
+    const res = verifyProperty(properties, sign, publicKey, AuthType.Package)
+      .validate('address', (address) => address === 'Daejeon')
+      .confirm({ token: true });
+    expect(res).to.be.null;
+  });
+  it('test validation with Privacy mode when using hash', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Privacy);
+    const propertiesWithHash = hideProperty(properties, ['age', 'address']);
+    const res = verifyProperty(propertiesWithHash, sign, publicKey, AuthType.Privacy)
+      .validate('age', (age) => Number(age) >= 15)
+      .confirm({ token: true });
+    expect(res).to.be.null;
   });
 });
