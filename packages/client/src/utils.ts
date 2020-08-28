@@ -1,5 +1,6 @@
 import { AES, enc } from 'crypto-js';
 import { hash } from '@0auth/message';
+import { Optional } from 'typescript-optional';
 
 export enum StorageType {
   LocalStorage = 'LOCAL_STORAGE',
@@ -51,10 +52,10 @@ export function storeData(data: string, dataType: DataType, storage: StorageType
   }
 }
 
-export function getData(dataType: DataType, storage: StorageType): string | null {
+export function getData(dataType: DataType, storage: StorageType): Optional<string> {
   switch (storage) {
     case StorageType.LocalStorage:
-      return localStorage.getItem(dataTypeToString(dataType));
+      return Optional.ofNullable(localStorage.getItem(dataTypeToString(dataType)));
     case StorageType.IndexedDB:
       throw new Error('Unimplemented');
     case StorageType.ChromeExtension:
@@ -69,21 +70,24 @@ export function getGeneratedRawKey(
   password?: string,
 ): string {
   const key = getData(DataType.Key, storage);
-  if (key !== null) {
-    if (password !== undefined) return decryptMessage(key, password);
-    return key;
-  }
-  const newKey = generateRandomKey();
-  if (password !== undefined) storeData(encryptMessage(newKey, password), DataType.Key, storage);
-  else storeData(newKey, DataType.Key, storage);
-  return newKey;
+  return key.matches({
+    present: (encrypted) => password !== undefined ? decryptMessage(encrypted, password) : encrypted,
+    empty: () => {
+      const newKey = generateRandomKey();
+      if (password !== undefined) storeData(encryptMessage(newKey, password), DataType.Key, storage);
+      else storeData(newKey, DataType.Key, storage);
+      return newKey;
+    },
+  });
 }
 
 export function getDecryptedMessage(
   key: string,
   storage: StorageType,
-): string | null {
+): Optional<string> {
   const message = getData(DataType.Message, storage);
-  if (message === null) return null;
-  return decryptMessage(message, key);
+  return message.matches({
+    present: (encrypted) => Optional.of(decryptMessage(encrypted, key)),
+    empty: () => Optional.empty()
+  })
 }
