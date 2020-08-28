@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   hashProperty, Property, PropertyType, Signature,
 } from '@0auth/message';
@@ -28,9 +27,10 @@ export function getSignature(
 ): DecryptedMessage | null {
   const key = getGeneratedRawKey(storage, password);
   const decryptedMessage = getDecryptedMessage(key, storage);
-  if (decryptedMessage === null) return null;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return JSON.parse(decryptedMessage);
+  return decryptedMessage.matches({
+    present: (message) => JSON.parse(message) as DecryptedMessage,
+    empty: () => null
+  });
 }
 
 export function hideProperty(properties: Property[], hideNames: string[]): Property[] {

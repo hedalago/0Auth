@@ -15,7 +15,8 @@
   "dependencies": {
     "@0auth/message": "^0.0.1",
     "axios": "^0.19.2",
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "typescript-optional": "^2.0.1"
   },
   "devDependencies": {
     "@0auth/server": "^0.0.1",

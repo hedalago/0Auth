@@ -42,10 +42,12 @@ describe('test utils', () => {
     localStorage.clear();
   });
   it('test LocalStorage Mock', () => {
+    expect(getData(DataType.Key, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
+    expect(getData(DataType.Message, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
     storeData('stored key', DataType.Key, StorageType.LocalStorage);
     storeData('stored message', DataType.Message, StorageType.LocalStorage);
-    expect(getData(DataType.Key, StorageType.LocalStorage)).to.be.equal('stored key');
-    expect(getData(DataType.Message, StorageType.LocalStorage)).to.be.equal('stored message');
+    expect(getData(DataType.Key, StorageType.LocalStorage).get()).to.be.equal('stored key');
+    expect(getData(DataType.Message, StorageType.LocalStorage).get()).to.be.equal('stored message');
   });
   it('test Encrypt & Decrypt message', () => {
     const encryptedMessage = encryptMessage('Message', '1q2w3e4r');
@@ -62,9 +64,9 @@ describe('test utils', () => {
     expect(decryptedMessage).to.be.equal(message);
   });
   it('test Decrypted Message', () => {
-    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage)).to.be.null;
+    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage).orNull()).to.be.null;
     storeData(encryptMessage('stored message', 'encryption key'), DataType.Message, StorageType.LocalStorage);
-    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage)).to.be.equal(
+    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage).get()).to.be.equal(
       'stored message',
     );
   });
