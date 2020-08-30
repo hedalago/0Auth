@@ -1,10 +1,15 @@
 {
   "name": "@0auth/message",
-  "version": "0.0.1",
-  "main": "./src/index.js",
+  "version": "1.0.7",
+  "main": "./lib/index.js",
   "description": "A message library for 0Auth",
   "repository": "https://github.com/0-Auth/0Auth.git",
   "author": "0Auth Team",
+  "scripts": {
+    "build": "yarn clean && yarn compile",
+    "clean": "rm -rf ./lib && rm -rf tsconfig.tsbuildinfo",
+    "compile": "tsc"
+  },
   "keywords": [
     "authenticate",
     "credential",
@@ -14,7 +19,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@0auth/message": "^0.0.1",
+    "@0auth/message": "^1.0.7",
     "crypto-js": "^4.0.0"
   },
   "devDependencies": {
