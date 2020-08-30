@@ -1,6 +1,6 @@
 {
   "name": "@0auth/message",
-  "version": "0.0.1",
+  "version": "1.0.2",
   "main": "./src/index.js",
   "description": "A message library for 0Auth",
   "repository": "https://github.com/0-Auth/0Auth.git",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@0auth/message": "^0.0.1",
+    "@0auth/message": "^1.0.2",
     "crypto-js": "^4.0.0"
   },
   "devDependencies": {
