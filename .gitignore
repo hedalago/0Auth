@@ -30,6 +30,7 @@ out/
 # TypeScript
 **/*.js
 lib/
+**/tsconfig.tsbuildinfo
 
 # Testing
 .nyc_output/

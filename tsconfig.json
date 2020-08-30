@@ -1,16 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
-    "lib": ["es5", "es2015", "dom"],
+    "target": "ES5",
+    "module": "commonjs",
     "strict": true,
     "baseUrl": ".",
-    "rootDir": ".",
-    "outDir": "lib",
     "paths": {
       "@0auth/*": ["packages/*/src"]
     },
     "declaration": true,
+    "composite": true,
     "declarationMap": true,
     "sourceMap": true,
     "skipLibCheck": true,
@@ -18,5 +16,5 @@
     "esModuleInterop": true,
     "moduleResolution": "node"
   },
-  "exclude": ["node_modules/*", "lib/*", "**/*.spec.ts"]
+  "exclude": ["node_modules/*", "**/lib/*", "**/*.spec.ts"]
 }
