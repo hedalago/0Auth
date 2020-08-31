@@ -1,0 +1,64 @@
+{
+  "register body Example": {
+    "properties": [
+      {
+        "type": "RAW",
+        "key": "name",
+        "value": "kherootz"
+      },
+      {
+        "type": "RAW",
+        "key": "phone",
+        "value": "010-1234-5678"
+      },
+      {
+        "type": "RAW",
+        "key": "address",
+        "value": "Daejeon Yuseong-gu"
+      },
+      {
+        "type": "RAW",
+        "key": "age",
+        "value": "25"
+      }
+    ]
+  },
+  "register result Example": {
+    "authType": "PRIVACY",
+    "keyType": "ECDSA",
+    "value": "3046022100d7719965b55c81d9a078520ce9de3f3da606346fcbb2f9895de2999aafe6e224022100a99df25becc64fc19397f077c0033e7dd663d8d7dc2e71655a0c84b83c3213a3"
+  },
+  "view/movie/1 body Example": {
+    "properties": [
+      {
+        "type": "RAW",
+        "key": "name",
+        "value": "kherootz"
+      },
+      {
+        "type": "RAW",
+        "key": "phone",
+        "value": "010-1234-5678"
+      },
+      {
+        "type": "RAW",
+        "key": "address",
+        "value": "Daejeon Yuseong-gu"
+      },
+      {
+        "type": "RAW",
+        "key": "age",
+        "value": "25"
+      }
+    ],
+    "sign": {
+      "authType": "PRIVACY",
+      "keyType": "ECDSA",
+      "value": "3046022100d7719965b55c81d9a078520ce9de3f3da606346fcbb2f9895de2999aafe6e224022100a99df25becc64fc19397f077c0033e7dd663d8d7dc2e71655a0c84b83c3213a3"
+    }
+  },
+  "view/movie/1 Example": {
+    "name": "Les Misérables",
+    "seat": 1
+  }
+}
