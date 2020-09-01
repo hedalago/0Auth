@@ -27,21 +27,26 @@ export function generateRandomKey(): string {
   return hash(random + date);
 }
 
-export function dataTypeToString(dataType: DataType): string {
+export function dataTypeToString(key: string, dataType: DataType): string {
   switch (dataType) {
     case DataType.Key:
-      return 'Key';
+      return `Key_${key}`;
     case DataType.Message:
-      return 'Message';
+      return `Message_${key}`;
     default:
       throw new Error('Unreachable code');
   }
 }
 
-export function storeData(data: string, dataType: DataType, storage: StorageType): void {
+export function storeData(
+  key: string,
+  data: string,
+  dataType: DataType,
+  storage: StorageType,
+): void {
   switch (storage) {
     case StorageType.LocalStorage:
-      localStorage.setItem(dataTypeToString(dataType), data);
+      localStorage.setItem(dataTypeToString(key, dataType), data);
       return;
     case StorageType.IndexedDB:
       throw new Error('Unimplemented');
@@ -52,10 +57,10 @@ export function storeData(data: string, dataType: DataType, storage: StorageType
   }
 }
 
-export function getData(dataType: DataType, storage: StorageType): Optional<string> {
+export function getData(key: string, dataType: DataType, storage: StorageType): Optional<string> {
   switch (storage) {
     case StorageType.LocalStorage:
-      return Optional.ofNullable(localStorage.getItem(dataTypeToString(dataType)));
+      return Optional.ofNullable(localStorage.getItem(dataTypeToString(key, dataType)));
     case StorageType.IndexedDB:
       throw new Error('Unimplemented');
     case StorageType.ChromeExtension:
@@ -66,28 +71,31 @@ export function getData(dataType: DataType, storage: StorageType): Optional<stri
 }
 
 export function getGeneratedRawKey(
+  key: string,
   storage: StorageType,
   password?: string,
 ): string {
-  const key = getData(DataType.Key, storage);
-  return key.matches({
-    present: (encrypted) => password !== undefined ? decryptMessage(encrypted, password) : encrypted,
+  const encryptionKey = getData(key, DataType.Key, storage);
+  return encryptionKey.matches({
+    present: (encrypted) => (password !== undefined ? decryptMessage(encrypted, password) : encrypted),
     empty: () => {
-      const newKey = generateRandomKey();
-      if (password !== undefined) storeData(encryptMessage(newKey, password), DataType.Key, storage);
-      else storeData(newKey, DataType.Key, storage);
-      return newKey;
+      const newEncryptionKey = generateRandomKey();
+      if (password !== undefined) {
+        storeData(key, encryptMessage(newEncryptionKey, password), DataType.Key, storage);
+      } else storeData(key, newEncryptionKey, DataType.Key, storage);
+      return newEncryptionKey;
     },
   });
 }
 
 export function getDecryptedMessage(
   key: string,
+  encryptionKey: string,
   storage: StorageType,
 ): Optional<string> {
-  const message = getData(DataType.Message, storage);
+  const message = getData(key, DataType.Message, storage);
   return message.matches({
-    present: (encrypted) => Optional.of(decryptMessage(encrypted, key)),
-    empty: () => Optional.empty()
-  })
+    present: (encrypted) => Optional.of(decryptMessage(encrypted, encryptionKey)),
+    empty: () => Optional.empty(),
+  });
 }
