@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import {
-  hash, hashProperty, Property, PropertyType, utf8ToBase64,
+  hash, hashProperty, objectToProperty, Property, PropertyType, utf8ToBase64,
 } from '../src';
 
 describe('test message utils', () => {
@@ -23,5 +23,27 @@ describe('test message utils', () => {
   });
   it('test hash', () => {
     expect(hash('abc')).to.be.equal('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+  });
+  it('test object to property', () => {
+    const object = { name: 'Hyeock-Jin', age: '25', address: 'Daejeon' };
+    const properties = objectToProperty(object);
+
+    expect(properties).to.be.deep.equal([
+      {
+        key: 'name',
+        type: 'RAW',
+        value: 'Hyeock-Jin',
+      },
+      {
+        key: 'age',
+        type: 'RAW',
+        value: '25',
+      },
+      {
+        key: 'address',
+        type: 'RAW',
+        value: 'Daejeon',
+      },
+    ]);
   });
 });
