@@ -42,12 +42,12 @@ describe('test utils', () => {
     localStorage.clear();
   });
   it('test LocalStorage Mock', () => {
-    expect(getData(DataType.Key, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
-    expect(getData(DataType.Message, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
-    storeData('stored key', DataType.Key, StorageType.LocalStorage);
-    storeData('stored message', DataType.Message, StorageType.LocalStorage);
-    expect(getData(DataType.Key, StorageType.LocalStorage).get()).to.be.equal('stored key');
-    expect(getData(DataType.Message, StorageType.LocalStorage).get()).to.be.equal('stored message');
+    expect(getData('test', DataType.Key, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
+    expect(getData('test', DataType.Message, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
+    storeData('test', 'stored key', DataType.Key, StorageType.LocalStorage);
+    storeData('test', 'stored message', DataType.Message, StorageType.LocalStorage);
+    expect(getData('test', DataType.Key, StorageType.LocalStorage).get()).to.be.equal('stored key');
+    expect(getData('test', DataType.Message, StorageType.LocalStorage).get()).to.be.equal('stored message');
   });
   it('test Encrypt & Decrypt message', () => {
     const encryptedMessage = encryptMessage('Message', '1q2w3e4r');
@@ -64,9 +64,9 @@ describe('test utils', () => {
     expect(decryptedMessage).to.be.equal(message);
   });
   it('test Decrypted Message', () => {
-    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage).orNull()).to.be.null;
-    storeData(encryptMessage('stored message', 'encryption key'), DataType.Message, StorageType.LocalStorage);
-    expect(getDecryptedMessage('encryption key', StorageType.LocalStorage).get()).to.be.equal(
+    expect(getDecryptedMessage('test', 'encryption key', StorageType.LocalStorage).orNull()).to.be.null;
+    storeData('test', encryptMessage('stored message', 'encryption key'), DataType.Message, StorageType.LocalStorage);
+    expect(getDecryptedMessage('test', 'encryption key', StorageType.LocalStorage).get()).to.be.equal(
       'stored message',
     );
   });
@@ -95,20 +95,39 @@ describe('test store localStorage', () => {
     localStorage.clear();
   });
   it('test storing signature in localStorage not using password', () => {
-    expect(getSignature(StorageType.LocalStorage)).to.be.null;
-    storeSignature(properties, sign, StorageType.LocalStorage);
-    const storageData = getSignature(StorageType.LocalStorage);
+    expect(getSignature('test', StorageType.LocalStorage)).to.be.null;
+    storeSignature('test', properties, sign, StorageType.LocalStorage);
+    const storageData = getSignature('test', StorageType.LocalStorage);
     expect(storageData).to.be.not.null;
-    expect(storageData.properties).to.be.deep.equal(properties);
-    expect(storageData.sign).to.be.deep.equal(sign);
+    expect(storageData?.properties).to.be.deep.equal(properties);
+    expect(storageData?.sign).to.be.deep.equal(sign);
   });
   it('test storing signature in localStorage using password', () => {
-    expect(getSignature(StorageType.LocalStorage, 'abc')).to.be.null;
-    storeSignature(properties, sign, StorageType.LocalStorage, 'abc');
-    const storageData = getSignature(StorageType.LocalStorage, 'abc');
+    expect(getSignature('test', StorageType.LocalStorage, 'abc')).to.be.null;
+    storeSignature('test', properties, sign, StorageType.LocalStorage, 'abc');
+    const storageData = getSignature('test', StorageType.LocalStorage, 'abc');
     expect(storageData).to.be.not.null;
-    expect(storageData.properties).to.be.deep.equal(properties);
-    expect(storageData.sign).to.be.deep.equal(sign);
+    expect(storageData?.properties).to.be.deep.equal(properties);
+    expect(storageData?.sign).to.be.deep.equal(sign);
+  });
+  it('test storing signature in localStorage using different key', () => {
+    expect(getSignature('test1', StorageType.LocalStorage), 'abc').to.be.null;
+    expect(getSignature('test2', StorageType.LocalStorage)).to.be.null;
+    storeSignature('test1', properties, sign, StorageType.LocalStorage, 'abc');
+    expect(getSignature('test2', StorageType.LocalStorage)).to.be.null;
+  });
+  it('test get stored signature in localStorage using different key', () => {
+    storeSignature('test1', properties, sign, StorageType.LocalStorage, 'abc');
+    storeSignature('test2', properties, sign, StorageType.LocalStorage);
+
+    const storageData1 = getSignature('test1', StorageType.LocalStorage, 'abc');
+    expect(storageData1).to.be.not.null;
+    expect(storageData1?.properties).to.be.deep.equal(properties);
+    expect(storageData1?.sign).to.be.deep.equal(sign);
+    const storageData2 = getSignature('test2', StorageType.LocalStorage);
+    expect(storageData2).to.be.not.null;
+    expect(storageData2?.properties).to.be.deep.equal(properties);
+    expect(storageData2?.sign).to.be.deep.equal(sign);
   });
 });
 

@@ -2,7 +2,7 @@ import {
   hashProperty, Property, PropertyType, Signature,
 } from '@0auth/message';
 import {
-  DataType, encryptMessage, getDecryptedMessage, getGeneratedRawKey, StorageType, storeData,
+  DataType, decryptMessage, encryptMessage, getData, getDecryptedMessage, getGeneratedRawKey, StorageType, storeData,
 } from './utils';
 
 export type DecryptedMessage = {
@@ -11,25 +11,34 @@ export type DecryptedMessage = {
 };
 
 export function storeSignature(
+  key: string,
   properties: Property[],
   sign: Signature,
   storage: StorageType,
   password?: string,
 ): void {
-  const key = getGeneratedRawKey(storage, password);
-  const encrypted = encryptMessage(JSON.stringify({ properties, sign }), key);
-  storeData(encrypted, DataType.Message, storage);
+  const encryptionKey = getGeneratedRawKey(key, storage, password);
+  const encrypted = encryptMessage(JSON.stringify({ properties, sign }), encryptionKey);
+  storeData(key, encrypted, DataType.Message, storage);
 }
 
 export function getSignature(
+  key: string,
   storage: StorageType,
   password?: string,
 ): DecryptedMessage | null {
-  const key = getGeneratedRawKey(storage, password);
-  const decryptedMessage = getDecryptedMessage(key, storage);
-  return decryptedMessage.matches({
-    present: (message) => JSON.parse(message) as DecryptedMessage,
-    empty: () => null
+  const encryptionKey = getData(key, DataType.Key, storage);
+  return encryptionKey.matches({
+    present: (encKey) => {
+      let decryptedMessage;
+      if (password !== undefined) decryptedMessage = getDecryptedMessage(key, decryptMessage(encKey, password), storage);
+      else decryptedMessage = getDecryptedMessage(key, encKey, storage);
+      return decryptedMessage.matches({
+        present: (message) => JSON.parse(message) as DecryptedMessage,
+        empty: () => null,
+      });
+    },
+    empty: () => null,
   });
 }
 
