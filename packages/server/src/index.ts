@@ -1,15 +1,5 @@
-import {
-  AuthType,
-  hash,
-  hashProperty,
-  KeyType,
-  Property,
-  Signature,
-  utf8ToBase64,
-} from '@0auth/message';
-import {
-  getMerkleRoot, propertyObject, signByKeyType, verifyByKeyType,
-} from './utils';
+import { AuthType, hash, hashProperty, KeyType, Property, Signature, utf8ToBase64 } from '@0auth/message';
+import { getMerkleRoot, propertyObject, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from './utils';
 
 type SecretKey = {
   type: KeyType;
@@ -37,13 +27,25 @@ type SubmitInfo<T> = {
   confirm: Supplier<T, T | null>;
 };
 
+export function publicKeyFromSecret(secret: SecretKey): PublicKey {
+  return {
+    key: publicKeyFromKeyString(secret.key, secret.type),
+    type: secret.type,
+  };
+}
+
 export function authPrivacy(
   properties: Property[],
   secret: SecretKey,
 ): Signature {
   const hashes = properties.map((property) => hashProperty(property));
   const merkleRoot = getMerkleRoot(hashes);
-  return signByKeyType(merkleRoot, secret.key, secret.type);
+  const sign = signByKeyType(merkleRoot, secret.key, secret.type);
+  return {
+    authType: AuthType.Privacy,
+    keyType: secret.type,
+    value: sign,
+  };
 }
 
 export function authPackage(
@@ -54,7 +56,12 @@ export function authPackage(
     (property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`,
   );
   const hashValue = hash(encodings.join(','));
-  return signByKeyType(hashValue, secret.key, secret.type);
+  const sign = signByKeyType(hashValue, secret.key, secret.type);
+  return {
+    authType: AuthType.Package,
+    keyType: KeyType.ECDSA,
+    value: sign,
+  };
 }
 
 export function verifyPrivacy(
