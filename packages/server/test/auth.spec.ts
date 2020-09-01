@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { AuthType, hashProperty, KeyType, Property, PropertyType } from '@0auth/message';
+import { AuthType, hashProperty, KeyType, objectToProperty, Property, PropertyType } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 import {
   authPackage,
@@ -11,7 +11,7 @@ import {
   verifyPrivacy,
   verifyProperty,
 } from '../src';
-import { getMerkleRoot, objectToProperty, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from '../src/utils';
+import { getMerkleRoot, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from '../src/utils';
 import { hideProperty } from '../../client/src';
 
 describe('test server utils', () => {
@@ -30,28 +30,6 @@ describe('test server utils', () => {
     const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
     const publicKey = publicKeyFromKeyString(secretKeyString, KeyType.EDDSA);
     expect(publicKey).to.be.equal('cb7da1efe0ca47d03ff12d1b8f01160debf62c0a2cb2517251f3019d61e0c5f3');
-  });
-  it('test object to property', () => {
-    const object = { name: 'Hyeock-Jin', age: '25', address: 'Daejeon' };
-    const properties = objectToProperty(object);
-
-    expect(properties).to.be.deep.equal([
-      {
-        key: 'name',
-        type: 'RAW',
-        value: 'Hyeock-Jin',
-      },
-      {
-        key: 'age',
-        type: 'RAW',
-        value: '25',
-      },
-      {
-        key: 'address',
-        type: 'RAW',
-        value: 'Daejeon',
-      },
-    ]);
   });
 });
 

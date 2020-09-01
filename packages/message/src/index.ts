@@ -41,3 +41,26 @@ export function hashProperty(property: Property): string {
 
   return hash(`${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`);
 }
+
+export function propertyObject(properties: Property[]): { [key: string]: string } {
+  return properties.reduce(
+    (dict: { [key: string]: string }, property) => {
+      if (property.type !== PropertyType.Hash) {
+        return {
+          ...dict,
+          [property.key]: property.value,
+        };
+      }
+      return dict;
+    },
+    {},
+  );
+}
+
+export function objectToProperty(object: { [key: string]: string }): Property[] {
+  return Object.keys(object).map(key => ({
+    type: PropertyType.Raw,
+    key,
+    value: object[key]
+  }))
+}

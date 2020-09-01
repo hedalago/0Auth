@@ -1,8 +1,16 @@
-import { AuthType, hash, hashProperty, KeyType, Property, Signature, utf8ToBase64 } from '@0auth/message';
+import {
+  AuthType,
+  hash,
+  hashProperty,
+  KeyType,
+  objectToProperty,
+  Property,
+  propertyObject,
+  Signature,
+  utf8ToBase64,
+} from '@0auth/message';
 import {
   getMerkleRoot,
-  objectToProperty,
-  propertyObject,
   publicKeyFromKeyString,
   signByKeyType,
   verifyByKeyType,
