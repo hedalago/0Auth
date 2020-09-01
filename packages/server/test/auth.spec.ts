@@ -5,12 +5,13 @@ import {
   authPackage,
   authPrivacy,
   authProperty,
+  issueProperty,
   publicKeyFromSecret,
   verifyPackage,
   verifyPrivacy,
   verifyProperty,
 } from '../src';
-import { getMerkleRoot, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from '../src/utils';
+import { getMerkleRoot, objectToProperty, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from '../src/utils';
 import { hideProperty } from '../../client/src';
 
 describe('test server utils', () => {
@@ -29,6 +30,28 @@ describe('test server utils', () => {
     const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
     const publicKey = publicKeyFromKeyString(secretKeyString, KeyType.EDDSA);
     expect(publicKey).to.be.equal('cb7da1efe0ca47d03ff12d1b8f01160debf62c0a2cb2517251f3019d61e0c5f3');
+  });
+  it('test object to property', () => {
+    const object = { name: 'Hyeock-Jin', age: '25', address: 'Daejeon' };
+    const properties = objectToProperty(object);
+
+    expect(properties).to.be.deep.equal([
+      {
+        key: 'name',
+        type: 'RAW',
+        value: 'Hyeock-Jin',
+      },
+      {
+        key: 'age',
+        type: 'RAW',
+        value: '25',
+      },
+      {
+        key: 'address',
+        type: 'RAW',
+        value: 'Daejeon',
+      },
+    ]);
   });
 });
 
@@ -295,5 +318,50 @@ describe('get public key', () => {
     const sign = signByKeyType(value, secret.key, KeyType.EDDSA);
     const publicKey = publicKeyFromSecret(secret);
     expect(verifyByKeyType(value, sign, publicKey.key, publicKey.type)).to.be.true;
+  });
+});
+
+describe('issue properties test', () => {
+  const object = { name: 'Hyeock-Jin', age: '25', address: 'Daejeon' };
+  const properties = objectToProperty(object);
+  it('test issuance in ECDSA using Privacy mode', () => {
+    const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
+    const secret = {
+      key: secretKeyString,
+      type: KeyType.ECDSA,
+    };
+    const publicKey = publicKeyFromSecret(secret);
+    const sign = issueProperty(object, secret, AuthType.Privacy);
+    expect(verifyPrivacy(properties, sign, publicKey)).to.be.true;
+  });
+  it('test issuance in EdDSA using Privacy mode', () => {
+    const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
+    const secret = {
+      key: secretKeyString,
+      type: KeyType.EDDSA,
+    };
+    const publicKey = publicKeyFromSecret(secret);
+    const sign = issueProperty(object, secret, AuthType.Privacy);
+    expect(verifyPrivacy(properties, sign, publicKey)).to.be.true;
+  });
+  it('test issuance in ECDSA using Package mode', () => {
+    const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
+    const secret = {
+      key: secretKeyString,
+      type: KeyType.ECDSA,
+    };
+    const publicKey = publicKeyFromSecret(secret);
+    const sign = issueProperty(object, secret, AuthType.Package);
+    expect(verifyPackage(properties, sign, publicKey)).to.be.true;
+  });
+  it('test issuance in EdDSA using Package mode', () => {
+    const secretKeyString = '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a';
+    const secret = {
+      key: secretKeyString,
+      type: KeyType.EDDSA,
+    };
+    const publicKey = publicKeyFromSecret(secret);
+    const sign = issueProperty(object, secret, AuthType.Package);
+    expect(verifyPackage(properties, sign, publicKey)).to.be.true;
   });
 });
