@@ -1,5 +1,12 @@
 import { AuthType, hash, hashProperty, KeyType, Property, Signature, utf8ToBase64 } from '@0auth/message';
-import { getMerkleRoot, propertyObject, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from './utils';
+import {
+  getMerkleRoot,
+  objectToProperty,
+  propertyObject,
+  publicKeyFromKeyString,
+  signByKeyType,
+  verifyByKeyType,
+} from './utils';
 
 type SecretKey = {
   type: KeyType;
@@ -89,6 +96,28 @@ export function verifyPackage(
   return verifyByKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
 }
 
+function authByAuthType(properties: Property[], secret: SecretKey, type: AuthType) {
+  switch (type) {
+    case AuthType.Privacy:
+      return authPrivacy(properties, secret);
+    case AuthType.Package:
+      return authPackage(properties, secret);
+    default:
+      throw new Error('Unreachable Code');
+  }
+}
+
+function verifyByAuthType(properties: Property[], sign: Signature, publicKey: PublicKey, type: AuthType) {
+  switch (type) {
+    case AuthType.Privacy:
+      return verifyPrivacy(properties, sign, publicKey);
+    case AuthType.Package:
+      return verifyPackage(properties, sign, publicKey);
+    default:
+      throw new Error('Unreachable Code');
+  }
+}
+
 export function authProperty(properties: Property[]): RegisterInfo {
   let isPassed = true;
   const propertiesObj = propertyObject(properties);
@@ -103,14 +132,7 @@ export function authProperty(properties: Property[]): RegisterInfo {
       if (!isPassed) {
         return null;
       }
-      switch (mode) {
-        case AuthType.Privacy:
-          return authPrivacy(properties, key);
-        case AuthType.Package:
-          return authPackage(properties, key);
-        default:
-          return null;
-      }
+      return authByAuthType(properties, key, mode);
     },
   };
 }
@@ -121,16 +143,7 @@ export function verifyProperty<T>(
   publicKey: PublicKey,
   mode: AuthType,
 ): SubmitInfo<T> {
-  let isPassed = true;
-  switch (mode) {
-    case AuthType.Privacy:
-      isPassed = verifyPrivacy(properties, sign, publicKey);
-      break;
-    case AuthType.Package:
-      isPassed = verifyPackage(properties, sign, publicKey);
-      break;
-    default:
-  }
+  let isPassed = verifyByAuthType(properties, sign, publicKey, mode);
   const propertiesObj = propertyObject(properties);
   return {
     validate(key: string, func: Predicate<string>): SubmitInfo<T> {
@@ -146,4 +159,13 @@ export function verifyProperty<T>(
       return response;
     },
   };
+}
+
+export function issueProperty(
+  object: { [key: string]: string },
+  secret: SecretKey,
+  authType: AuthType,
+): Signature {
+  const properties = objectToProperty(object);
+  return authByAuthType(properties, secret, authType);
 }
