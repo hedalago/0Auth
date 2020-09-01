@@ -18,13 +18,13 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@0auth/message": "^1.0.7",
+    "@0auth/message": "^1.0.8",
     "axios": "^0.19.2",
     "crypto-js": "^4.0.0",
     "typescript-optional": "^2.0.1"
   },
   "devDependencies": {
-    "@0auth/server": "^1.0.7",
+    "@0auth/server": "^1.0.8",
     "elliptic": "^6.5.3",
     "@types/crypto-js": "^3.1.47",
     "@types/elliptic": "^6.4.12"
