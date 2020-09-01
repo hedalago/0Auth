@@ -19,7 +19,6 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@0auth/message": "^1.0.7",
     "crypto-js": "^4.0.0"
   },
   "devDependencies": {
