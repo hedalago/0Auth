@@ -1,5 +1,5 @@
 import {
-  AuthType, hash, KeyType, Property, PropertyType, Signature,
+  hash, KeyType, Property, PropertyType,
 } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 
@@ -18,29 +18,38 @@ export function getMerkleRoot(properties: string[]): string {
   return getMerkleRoot(parentNodes);
 }
 
+export function publicKeyFromKeyString(keyString: string, type: KeyType): string {
+  switch (type) {
+    case KeyType.ECDSA: {
+      const ecdsa = new ECDSA('secp256k1');
+      const secret = ecdsa.keyFromPrivate(keyString, 'hex');
+      return secret.getPublic('hex');
+    }
+    case KeyType.EDDSA: {
+      const eddsa = new EdDSA('ed25519');
+      const secret = eddsa.keyFromSecret(keyString);
+      return secret.getPublic('hex');
+    }
+    default:
+      throw new Error('Unreachable Code');
+  }
+}
+
 export function signByKeyType(
   hashValue: string,
   secret: string,
   type: KeyType,
-): Signature {
+): string {
   switch (type) {
     case KeyType.ECDSA: {
       const ecdsa = new ECDSA('secp256k1');
       const key = ecdsa.keyFromPrivate(secret, 'hex');
-      return {
-        authType: AuthType.Privacy,
-        keyType: KeyType.ECDSA,
-        value: key.sign(hashValue).toDER('hex'),
-      };
+      return key.sign(hashValue).toDER('hex');
     }
     case KeyType.EDDSA: {
       const eddsa = new EdDSA('ed25519');
       const key = eddsa.keyFromSecret(secret);
-      return {
-        authType: AuthType.Privacy,
-        keyType: KeyType.EDDSA,
-        value: key.sign(hashValue).toHex(),
-      };
+      return key.sign(hashValue).toHex();
     }
     default:
       throw new Error('Unreachable Code');
