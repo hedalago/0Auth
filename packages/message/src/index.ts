@@ -58,9 +58,9 @@ export function propertyObject(properties: Property[]): { [key: string]: string 
 }
 
 export function objectToProperty(object: { [key: string]: string }): Property[] {
-  return Object.keys(object).map(key => ({
+  return Object.keys(object).map((key) => ({
     type: PropertyType.Raw,
     key,
-    value: object[key]
-  }))
+    value: object[key],
+  }));
 }
