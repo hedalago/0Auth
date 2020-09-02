@@ -65,6 +65,8 @@ fetch(url, {
 
 ### In server
 
+* Register & Validate rest api
+
 ```javascript
 import express from 'express';
 import bodyParser from 'body-parser';

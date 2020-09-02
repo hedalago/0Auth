@@ -1,6 +1,4 @@
-import {
-  hash, KeyType, Property, PropertyType,
-} from '@0auth/message';
+import { hash, KeyType } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 
 export function getMerkleRoot(properties: string[]): string {
