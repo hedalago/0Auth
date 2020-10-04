@@ -2,13 +2,9 @@ import { expect, use } from 'chai';
 import chaiHttp from 'chai-http';
 import chaiAsPromised from 'chai-as-promised';
 import { ec as ECDSA } from 'elliptic';
-import {
-  hashProperty, KeyType, Property, PropertyType,
-} from '@0auth/message';
+import { hashProperty, KeyType, Property, PropertyType } from '@0auth/message';
 import { authPrivacy, verifyPrivacy } from '@0auth/server';
-import {
-  getSignature, hideProperty, registerInfo, storeSignature,
-} from '../src';
+import { getSignature, hideProperty, storeSignature } from '../src';
 import {
   DataType,
   decryptMessage,
@@ -24,7 +20,8 @@ function mockStorage() {
   return {
     setItem: (key: string, value: string) => (storage[key] = value),
     removeItem: (key: string) => delete storage[key],
-    getItem: (key: string) => (storage[key] !== undefined ? storage[key] : null),
+    getItem: (key: string) =>
+      storage[key] !== undefined ? storage[key] : null,
     clear: () => (storage = {}),
   };
 }
@@ -42,33 +39,65 @@ describe('test utils', () => {
     localStorage.clear();
   });
   it('test LocalStorage Mock', () => {
-    expect(getData('test', DataType.Key, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
-    expect(getData('test', DataType.Message, StorageType.LocalStorage).orUndefined()).to.be.equal(undefined);
+    expect(
+      getData('test', DataType.Key, StorageType.LocalStorage).orUndefined(),
+    ).to.be.equal(undefined);
+    expect(
+      getData('test', DataType.Message, StorageType.LocalStorage).orUndefined(),
+    ).to.be.equal(undefined);
     storeData('test', 'stored key', DataType.Key, StorageType.LocalStorage);
-    storeData('test', 'stored message', DataType.Message, StorageType.LocalStorage);
-    expect(getData('test', DataType.Key, StorageType.LocalStorage).get()).to.be.equal('stored key');
-    expect(getData('test', DataType.Message, StorageType.LocalStorage).get()).to.be.equal('stored message');
+    storeData(
+      'test',
+      'stored message',
+      DataType.Message,
+      StorageType.LocalStorage,
+    );
+    expect(
+      getData('test', DataType.Key, StorageType.LocalStorage).get(),
+    ).to.be.equal('stored key');
+    expect(
+      getData('test', DataType.Message, StorageType.LocalStorage).get(),
+    ).to.be.equal('stored message');
   });
   it('test Encrypt & Decrypt message', () => {
     const encryptedMessage = encryptMessage('Message', '1q2w3e4r');
     const decryptedMessage = decryptMessage(encryptedMessage, '1q2w3e4r');
     expect(decryptedMessage).to.be.equal('Message');
     expect(
-      decryptMessage('U2FsdGVkX1/tAtcP+fxui5NTWXrmvtO2dV5Z4obDLP4=', '1q2w3e4r'),
+      decryptMessage(
+        'U2FsdGVkX1/tAtcP+fxui5NTWXrmvtO2dV5Z4obDLP4=',
+        '1q2w3e4r',
+      ),
     ).to.be.equal('Message');
   });
   it('test Encrypt & Decrypt Long message', () => {
-    const message = "{'properties':[{'key':'name','type':0,'value':'Kim'},{'key':'age','type':0,'value':'17'},{'key':'address','type':0,'value':'Seoul'}],'sign':{'authType':0,'keyType':1,'value':'304402207282d176a100f0d5feb3faa160bd39843253ec98487cc3342905260ab592b85e02201fdf55464c12bbe4b93868a6e84da59e816e918d52cc599678605f61846426c6'}}\n";
+    const message =
+      "{'properties':[{'key':'name','type':0,'value':'Kim'},{'key':'age','type':0,'value':'17'},{'key':'address','type':0,'value':'Seoul'}],'sign':{'authType':0,'keyType':1,'value':'304402207282d176a100f0d5feb3faa160bd39843253ec98487cc3342905260ab592b85e02201fdf55464c12bbe4b93868a6e84da59e816e918d52cc599678605f61846426c6'}}\n";
     const encryptedMessage = encryptMessage(message, '1q2w3e4r');
     const decryptedMessage = decryptMessage(encryptedMessage, '1q2w3e4r');
     expect(decryptedMessage).to.be.equal(message);
   });
   it('test Decrypted Message', () => {
-    expect(getDecryptedMessage('test', 'encryption key', StorageType.LocalStorage).orNull()).to.be.null;
-    storeData('test', encryptMessage('stored message', 'encryption key'), DataType.Message, StorageType.LocalStorage);
-    expect(getDecryptedMessage('test', 'encryption key', StorageType.LocalStorage).get()).to.be.equal(
-      'stored message',
+    expect(
+      getDecryptedMessage(
+        'test',
+        'encryption key',
+        StorageType.LocalStorage,
+      ).orNull(),
+    ).to.be.null;
+    storeData(
+      'test',
+      encryptMessage('stored message', 'encryption key'),
+      DataType.Message,
+      StorageType.LocalStorage,
     );
+    expect(
+      getDecryptedMessage(
+        'test',
+        'encryption key',
+        StorageType.LocalStorage,
+      ).get(),
+    ).to.be.equal('stored message');
   });
 });
 
@@ -139,13 +168,20 @@ describe('test hide property', () => {
   ];
 
   it('test hide property value', () => {
-    const partiallyHiddenProperties = hideProperty(properties, ['name', 'address']);
+    const partiallyHiddenProperties = hideProperty(properties, [
+      'name',
+      'address',
+    ]);
     expect(partiallyHiddenProperties[0].type).to.be.equal(PropertyType.Hash);
     expect(partiallyHiddenProperties[0].key).to.be.equal('name');
-    expect(partiallyHiddenProperties[0].value).to.be.equal(hashProperty(properties[0]));
+    expect(partiallyHiddenProperties[0].value).to.be.equal(
+      hashProperty(properties[0]),
+    );
     expect(partiallyHiddenProperties[2].type).to.be.equal(PropertyType.Hash);
     expect(partiallyHiddenProperties[2].key).to.be.equal('address');
-    expect(partiallyHiddenProperties[2].value).to.be.equal(hashProperty(properties[2]));
+    expect(partiallyHiddenProperties[2].value).to.be.equal(
+      hashProperty(properties[2]),
+    );
 
     expect(partiallyHiddenProperties[1].type).to.be.equal(PropertyType.Raw);
     expect(partiallyHiddenProperties[1].key).to.be.equal('age');
@@ -156,9 +192,17 @@ describe('test hide property', () => {
     const key = ecdsa.keyFromPrivate(
       '2ef40452ec154cd38efdc8ffa52e7f513f7d2b2a77e028342bde96c369e4f77a',
     );
-    const sign = authPrivacy(properties, { key: key.getPrivate('hex'), type: KeyType.ECDSA });
+    const sign = authPrivacy(properties, {
+      key: key.getPrivate('hex'),
+      type: KeyType.ECDSA,
+    });
     const publicKey = { key: key.getPublic('hex'), type: KeyType.ECDSA };
-    const partiallyHiddenProperties = hideProperty(properties, ['name', 'address']);
-    expect(verifyPrivacy(partiallyHiddenProperties, sign, publicKey)).to.be.equal(true);
+    const partiallyHiddenProperties = hideProperty(properties, [
+      'name',
+      'address',
+    ]);
+    expect(
+      verifyPrivacy(partiallyHiddenProperties, sign, publicKey),
+    ).to.be.equal(true);
   });
 });
