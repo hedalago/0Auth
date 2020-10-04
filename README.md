@@ -2,6 +2,8 @@
 > A library for servicing using information stored in the user's local
 > area even if the data is not stored on the server.
 
+![CI](https://github.com/0-Auth/0Auth/workflows/CI/badge.svg)
+
 ## Installation
 
 ```bash
