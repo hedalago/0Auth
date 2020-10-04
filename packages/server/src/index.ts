@@ -38,7 +38,7 @@ type RegisterInfo = {
 };
 
 type SubmitInfo<T> = {
-  validate: KeySupplier<string, Predicate<string>, SubmitInfo<T>;
+  validate: KeySupplier<string, Predicate<string>, SubmitInfo<T>>;
   confirm: Supplier<T, T | null>;
   supply: Supplier<() => T, T | null>;
 };
@@ -69,7 +69,8 @@ export function authPackage(
   secret: SecretKey,
 ): Signature {
   const encodings = properties.map(
-    (property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`,
+    (property) =>
+      `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`,
   );
   const hashValue = hash(encodings.join(','));
   const sign = signByKeyType(hashValue, secret.key, secret.type);
@@ -99,13 +100,18 @@ export function verifyPackage(
   publicKey: PublicKey,
 ): boolean {
   const encodings = properties.map(
-    (property) => `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`,
+    (property) =>
+      `${utf8ToBase64(property.key)}:${utf8ToBase64(property.value)}`,
   );
   const hashValue = hash(encodings.join(','));
   return verifyByKeyType(hashValue, sign.value, publicKey.key, publicKey.type);
 }
 
-function authByAuthType(properties: Property[], secret: SecretKey, type: AuthType) {
+function authByAuthType(
+  properties: Property[],
+  secret: SecretKey,
+  type: AuthType,
+) {
   switch (type) {
     case AuthType.Privacy:
       return authPrivacy(properties, secret);
@@ -116,7 +122,12 @@ function authByAuthType(properties: Property[], secret: SecretKey, type: AuthTyp
   }
 }
 
-function verifyByAuthType(properties: Property[], sign: Signature, publicKey: PublicKey, type: AuthType) {
+function verifyByAuthType(
+  properties: Property[],
+  sign: Signature,
+  publicKey: PublicKey,
+  type: AuthType,
+) {
   switch (type) {
     case AuthType.Privacy:
       return verifyPrivacy(properties, sign, publicKey);
