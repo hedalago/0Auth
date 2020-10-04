@@ -38,8 +38,9 @@ type RegisterInfo = {
 };
 
 type SubmitInfo<T> = {
-  validate: KeySupplier<string, Predicate<string>, SubmitInfo<T>>;
+  validate: KeySupplier<string, Predicate<string>, SubmitInfo<T>;
   confirm: Supplier<T, T | null>;
+  supply: Supplier<() => T, T | null>;
 };
 
 export function publicKeyFromSecret(secret: SecretKey): PublicKey {
@@ -165,6 +166,12 @@ export function verifyProperty<T>(
         return null;
       }
       return response;
+    },
+    supply(supplier: () => T): T | null {
+      if (!isPassed) {
+        return null;
+      }
+      return supplier();
     },
   };
 }

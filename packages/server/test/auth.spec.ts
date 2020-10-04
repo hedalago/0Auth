@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import { AuthType, hashProperty, KeyType, objectToProperty, Property, PropertyType } from '@0auth/message';
+import {
+  AuthType, hashProperty, KeyType, objectToProperty, Property, PropertyType,
+} from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
 import {
   authPackage,
@@ -11,7 +13,9 @@ import {
   verifyPrivacy,
   verifyProperty,
 } from '../src';
-import { getMerkleRoot, publicKeyFromKeyString, signByKeyType, verifyByKeyType } from '../src/utils';
+import {
+  getMerkleRoot, publicKeyFromKeyString, signByKeyType, verifyByKeyType,
+} from '../src/utils';
 import { hideProperty } from '../../client/src';
 
 describe('test server utils', () => {
@@ -271,6 +275,28 @@ describe('test receive info', () => {
       .validate('age', (age) => Number(age) >= 15)
       .confirm({ token: true });
     expect(res).to.be.null;
+  });
+  it('test supplier when issue student ticket', () => {
+    const sign = authProperty(properties).sign(secretKey, AuthType.Privacy);
+    const propertiesWithHash = hideProperty(properties, ['address']);
+    const ticket = verifyProperty(propertiesWithHash, sign, publicKey, AuthType.Privacy)
+      .validate('age', (age) => Number(age) <= 19)
+      .supply(() => {
+        const studentTicket = { isStudent: 'TRUE', studentId: '202002001', name: properties[0].value };
+        return [studentTicket, issueProperty(studentTicket, secretKey, AuthType.Package)];
+      });
+    expect(ticket).to.be.deep.equal([
+      {
+        isStudent: 'TRUE',
+        name: 'Kim',
+        studentId: '202002001',
+      },
+      {
+        authType: 'PACKAGE',
+        keyType: 'ECDSA',
+        value: '802A2697C771E2FC18C3E60074AEAFD84531783384EA3637F1EAFD9DFBF03885A21F1E1411447581E3618C0AD85D788B1DC6C348695977DD1C8EA1C7C8D04103',
+      },
+    ]);
   });
 });
 
