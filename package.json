@@ -9,7 +9,7 @@
   "scripts": {
     "build": "yarn workspaces run build",
     "test": "nyc mocha packages/*/test/**/*.spec.ts",
-    "lint": "eslint packages/**/*.ts"
+    "lint": "eslint packages/**/src/*.ts"
   },
   "workspaces": [
     "packages/*"
