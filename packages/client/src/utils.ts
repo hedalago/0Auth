@@ -10,7 +10,7 @@ export enum StorageType {
 
 export enum DataType {
   Key = 'KEY',
-  Message = 'MESSAGE'
+  Message = 'MESSAGE',
 }
 
 export function encryptMessage(message: string, key: string): string {
@@ -57,10 +57,16 @@ export function storeData(
   }
 }
 
-export function getData(key: string, dataType: DataType, storage: StorageType): Optional<string> {
+export function getData(
+  key: string,
+  dataType: DataType,
+  storage: StorageType,
+): Optional<string> {
   switch (storage) {
     case StorageType.LocalStorage:
-      return Optional.ofNullable(localStorage.getItem(dataTypeToString(key, dataType)));
+      return Optional.ofNullable(
+        localStorage.getItem(dataTypeToString(key, dataType)),
+      );
     case StorageType.IndexedDB:
       throw new Error('Unimplemented');
     case StorageType.ChromeExtension:
@@ -77,11 +83,17 @@ export function getGeneratedRawKey(
 ): string {
   const encryptionKey = getData(key, DataType.Key, storage);
   return encryptionKey.matches({
-    present: (encrypted) => (password !== undefined ? decryptMessage(encrypted, password) : encrypted),
+    present: (encrypted) =>
+      password !== undefined ? decryptMessage(encrypted, password) : encrypted,
     empty: () => {
       const newEncryptionKey = generateRandomKey();
       if (password !== undefined) {
-        storeData(key, encryptMessage(newEncryptionKey, password), DataType.Key, storage);
+        storeData(
+          key,
+          encryptMessage(newEncryptionKey, password),
+          DataType.Key,
+          storage,
+        );
       } else storeData(key, newEncryptionKey, DataType.Key, storage);
       return newEncryptionKey;
     },
@@ -95,7 +107,8 @@ export function getDecryptedMessage(
 ): Optional<string> {
   const message = getData(key, DataType.Message, storage);
   return message.matches({
-    present: (encrypted) => Optional.of(decryptMessage(encrypted, encryptionKey)),
+    present: (encrypted) =>
+      Optional.of(decryptMessage(encrypted, encryptionKey)),
     empty: () => Optional.empty(),
   });
 }

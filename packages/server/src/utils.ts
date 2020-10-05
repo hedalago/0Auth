@@ -16,7 +16,10 @@ export function getMerkleRoot(properties: string[]): string {
   return getMerkleRoot(parentNodes);
 }
 
-export function publicKeyFromKeyString(keyString: string, type: KeyType): string {
+export function publicKeyFromKeyString(
+  keyString: string,
+  type: KeyType,
+): string {
   switch (type) {
     case KeyType.ECDSA: {
       const ecdsa = new ECDSA('secp256k1');
