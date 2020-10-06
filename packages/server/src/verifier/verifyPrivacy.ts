@@ -1,6 +1,6 @@
 import { AuthType, hashProperty, Property, Signature } from '@0auth/message';
 
-import { getMerkleRoot, verifyByKeyType } from '../util';
+import { getMerkleRoot, verifyByKeyType } from '../utils';
 import { PublicKey } from '../type';
 
 export function verifyPrivacy(

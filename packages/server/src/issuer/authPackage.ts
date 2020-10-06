@@ -7,7 +7,7 @@ import {
   utf8ToBase64,
 } from '@0auth/message';
 
-import { signByKeyType } from '../util';
+import { signByKeyType } from '../utils';
 import { SecretKey } from '../type';
 
 export function authPackage(

@@ -1,6 +1,6 @@
 import { hash, Property, Signature, utf8ToBase64 } from '@0auth/message';
 
-import { verifyByKeyType } from '../util';
+import { verifyByKeyType } from '../utils';
 import { PublicKey } from '../type';
 
 export function verifyPackage(

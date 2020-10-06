@@ -1,6 +1,6 @@
 import { AuthType, Property, Signature, hashProperty } from '@0auth/message';
 
-import { signByKeyType, getMerkleRoot } from '../util';
+import { signByKeyType, getMerkleRoot } from '../utils';
 import { SecretKey } from '../type';
 
 export function authPrivacy(

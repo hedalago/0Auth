@@ -23,7 +23,7 @@ import {
   publicKeyFromKeyString,
   signByKeyType,
   verifyByKeyType,
-} from '../src/util';
+} from '../src/utils';
 import { hideProperty } from '../../client/src';
 
 describe('test server utils', () => {
