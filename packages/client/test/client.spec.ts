@@ -4,16 +4,18 @@ import chaiAsPromised from 'chai-as-promised';
 import { ec as ECDSA } from 'elliptic';
 import { hashProperty, KeyType, Property, PropertyType } from '@0auth/message';
 import { authPrivacy, verifyPrivacy } from '@0auth/server';
-import { getSignature, hideProperty, storeSignature } from '../src';
 import {
+  getSignature,
+  hideProperty,
+  storeSignature,
+  StorageType,
   DataType,
   decryptMessage,
   encryptMessage,
   getData,
   getDecryptedMessage,
-  StorageType,
   storeData,
-} from '../src/utils';
+} from '../src';
 
 function mockStorage() {
   let storage: { [key: string]: string } = {};
