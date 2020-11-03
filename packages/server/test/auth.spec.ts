@@ -5,6 +5,7 @@ import {
   KeyType,
   objectToProperty,
   Property,
+  PropertyDataType,
   PropertyType,
 } from '@0auth/message';
 import { ec as ECDSA, eddsa as EdDSA } from 'elliptic';
@@ -24,7 +25,7 @@ import {
   signByKeyType,
   verifyByKeyType,
 } from '../src/utils';
-import { hideProperty } from '../../client/src';
+import { hideProperty } from '@0auth/client';
 
 describe('test server utils', () => {
   it('test merkle root', () => {
@@ -59,9 +60,24 @@ describe('test server utils', () => {
 
 describe('test privacy mode authentication', () => {
   const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'name',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Kim',
+    },
+    {
+      key: 'age',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.Number,
+      value: 17,
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
   it('test ECDSA authentication', () => {
     const ecdsa = new ECDSA('secp256k1');
@@ -179,16 +195,56 @@ describe('test privacy mode authentication', () => {
   });
   it('test if properties are different', () => {
     const properties1: Property[] = [
-      { key: 'a', type: PropertyType.Raw, value: 'b,c' },
-      { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-      { key: 'age', type: PropertyType.Raw, value: '17' },
-      { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+      {
+        key: 'a',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'b,c',
+      },
+      {
+        key: 'name',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'Kim',
+      },
+      {
+        key: 'age',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.Number,
+        value: 17,
+      },
+      {
+        key: 'address',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'Seoul',
+      },
     ];
     const properties2: Property[] = [
-      { key: 'a,b', type: PropertyType.Raw, value: 'c' },
-      { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-      { key: 'age', type: PropertyType.Raw, value: '17' },
-      { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+      {
+        key: 'a,b',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'c',
+      },
+      {
+        key: 'name',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'Kim',
+      },
+      {
+        key: 'age',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.Number,
+        value: 17,
+      },
+      {
+        key: 'address',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: 'Seoul',
+      },
     ];
     const ecdsa = new ECDSA('secp256k1');
     const key = ecdsa.keyFromPrivate(
@@ -207,9 +263,24 @@ describe('test privacy mode authentication', () => {
   });
   it('should Korean property', () => {
     const properties2: Property[] = [
-      { key: '이름', type: PropertyType.Raw, value: '김' },
-      { key: '나이', type: PropertyType.Raw, value: '25' },
-      { key: '주소', type: PropertyType.Raw, value: '서울' },
+      {
+        key: '이름',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: '김',
+      },
+      {
+        key: '나이',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.Number,
+        value: 25,
+      },
+      {
+        key: '주소',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.String,
+        value: '서울',
+      },
     ];
     const ecdsa = new ECDSA('secp256k1');
     const key = ecdsa.keyFromPrivate(
@@ -227,12 +298,19 @@ describe('test privacy mode authentication', () => {
       {
         key: 'name',
         type: PropertyType.Hash,
+        dataType: PropertyDataType.String,
         value: hashProperty(properties[0]),
       },
-      { key: 'age', type: PropertyType.Raw, value: '17' },
+      {
+        key: 'age',
+        type: PropertyType.Raw,
+        dataType: PropertyDataType.Number,
+        value: 17,
+      },
       {
         key: 'address',
         type: PropertyType.Hash,
+        dataType: PropertyDataType.String,
         value: hashProperty(properties[2]),
       },
     ];
@@ -254,9 +332,24 @@ describe('test privacy mode authentication', () => {
 
 describe('test package mode authentication', () => {
   const properties: Property[] = [
-    { key: 'email', type: PropertyType.Raw, value: 'abc@github.com' },
-    { key: 'phone', type: PropertyType.Raw, value: '010-1234-5678' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'email',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'abc@github.com',
+    },
+    {
+      key: 'phone',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: '010-1234-5678',
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
   it('test ECDSA authentication & verification using package mode', () => {
     const ecdsa = new ECDSA('secp256k1');
@@ -286,9 +379,24 @@ describe('test package mode authentication', () => {
 
 describe('test signing register info', () => {
   const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'name',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Kim',
+    },
+    {
+      key: 'age',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.Number,
+      value: 17,
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
   it('test the successful case of registration of EdDSA', () => {
     const eddsa = new EdDSA('ed25519');
@@ -299,8 +407,8 @@ describe('test signing register info', () => {
     const verifyingKey = publicKeyFromSecret(authKey);
 
     const sign = authProperty(properties)
-      .validate('name', (p) => p.length >= 2)
-      .validate('address', (p) => p.length >= 3)
+      .validate('name', (p) => String(p).length >= 2)
+      .validate('address', (p) => String(p).length >= 3)
       .sign(authKey, AuthType.Privacy);
 
     expect(verifyPrivacy(properties, sign, verifyingKey)).to.be.equal(true);
@@ -314,8 +422,8 @@ describe('test signing register info', () => {
     const verifyingKey = publicKeyFromSecret(authKey);
 
     const sign = authProperty(properties)
-      .validate('name', (p) => p.length >= 2)
-      .validate('address', (p) => p.length >= 3)
+      .validate('name', (p) => String(p).length >= 2)
+      .validate('address', (p) => String(p).length >= 3)
       .sign(authKey, AuthType.Privacy);
 
     expect(verifyPrivacy(properties, sign, verifyingKey)).to.be.equal(true);
@@ -349,9 +457,24 @@ describe('test signing register info', () => {
 
 describe('test receive info', () => {
   const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'name',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Kim',
+    },
+    {
+      key: 'age',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.Number,
+      value: 17,
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
   const eddsa = new EdDSA('ed25519');
   const key = eddsa.keyFromSecret(
@@ -375,6 +498,7 @@ describe('test receive info', () => {
     const res = verifyProperty(properties, sign, publicKey, AuthType.Privacy)
       .validate('age', (age) => Number(age) >= 15)
       .confirm({ token: true });
+    expect(res).to.be.not.null;
     expect(res).to.be.deep.equal({ token: true });
   });
   it('test the failure case with Privacy mode', () => {

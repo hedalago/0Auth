@@ -1,7 +1,7 @@
 import { AuthType, Property, propertyObject, Signature } from '@0auth/message';
 
 import { SubmitInfo, Predicate, PublicKey } from '../type';
-import { verifyByAuthType } from './verifyByAuthType';
+import { verifyByAuthType } from '@0auth/server';
 
 export function verifyProperty<T>(
   properties: Property[],
@@ -12,7 +12,7 @@ export function verifyProperty<T>(
   let isPassed = verifyByAuthType(properties, sign, publicKey, mode);
   const propertiesObj = propertyObject(properties);
   return {
-    validate(key: string, func: Predicate<string>): SubmitInfo<T> {
+    validate(key: string, func: Predicate<unknown>): SubmitInfo<T> {
       if (!func(propertiesObj[key])) {
         isPassed = false;
       }

@@ -2,19 +2,25 @@ import { expect, use } from 'chai';
 import chaiHttp from 'chai-http';
 import chaiAsPromised from 'chai-as-promised';
 import { ec as ECDSA } from 'elliptic';
-import { hashProperty, KeyType, Property, PropertyType } from '@0auth/message';
+import {
+  hashProperty,
+  KeyType,
+  Property,
+  PropertyDataType,
+  PropertyType,
+} from '@0auth/message';
 import { authPrivacy, verifyPrivacy } from '@0auth/server';
 import {
-  getSignature,
-  hideProperty,
-  storeSignature,
-  StorageType,
   DataType,
   decryptMessage,
   encryptMessage,
   getData,
   getDecryptedMessage,
+  getSignature,
+  hideProperty,
+  StorageType,
   storeData,
+  storeSignature,
 } from '../src';
 
 function mockStorage() {
@@ -105,9 +111,24 @@ describe('test utils', () => {
 
 describe('test store localStorage', () => {
   const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'name',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Kim',
+    },
+    {
+      key: 'age',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.Number,
+      value: 17,
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
   const ecdsa = new ECDSA('secp256k1');
   const secret = ecdsa.keyFromPrivate(
@@ -164,9 +185,24 @@ describe('test store localStorage', () => {
 
 describe('test hide property', () => {
   const properties: Property[] = [
-    { key: 'name', type: PropertyType.Raw, value: 'Kim' },
-    { key: 'age', type: PropertyType.Raw, value: '17' },
-    { key: 'address', type: PropertyType.Raw, value: 'Seoul' },
+    {
+      key: 'name',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Kim',
+    },
+    {
+      key: 'age',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.Number,
+      value: 17,
+    },
+    {
+      key: 'address',
+      type: PropertyType.Raw,
+      dataType: PropertyDataType.String,
+      value: 'Seoul',
+    },
   ];
 
   it('test hide property value', () => {
