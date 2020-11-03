@@ -1,13 +1,13 @@
 import { AuthType, Property, propertyObject, Signature } from '@0auth/message';
 
 import { Predicate, RegisterInfo, SecretKey } from '../type';
-import { authByAuthType } from './authByAuthType';
+import { authByAuthType } from '@0auth/server';
 
 export function authProperty(properties: Property[]): RegisterInfo {
   let isPassed = true;
   const propertiesObj = propertyObject(properties);
   return {
-    validate(key: string, func: Predicate<string>): RegisterInfo {
+    validate(key: string, func: Predicate<unknown>): RegisterInfo {
       if (!func(propertiesObj[key])) {
         isPassed = false;
       }

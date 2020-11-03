@@ -1,15 +1,23 @@
-import { PropertyType, Property } from '../type';
+import {
+  PropertyType,
+  Property,
+  PropertyData,
+  stringToDataType,
+} from '../type';
 
 export function propertyObject(
   properties: Property[],
-): { [key: string]: string } {
-  return properties.reduce((dict: { [key: string]: string }, property) => {
-    if (property.type !== PropertyType.Hash) {
-      return {
-        ...dict,
-        [property.key]: property.value,
-      };
-    }
-    return dict;
-  }, {});
+): { [key: string]: PropertyData } {
+  return properties.reduce(
+    (dict: { [key: string]: PropertyData }, property) => {
+      if (property.type !== PropertyType.Hash) {
+        return {
+          ...dict,
+          [property.key]: stringToDataType(property.value, property.dataType),
+        };
+      }
+      return dict;
+    },
+    {},
+  );
 }

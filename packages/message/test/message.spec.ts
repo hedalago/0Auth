@@ -1,10 +1,13 @@
 import { expect } from 'chai';
 import {
+  PropertyDataType,
   hash,
   hashProperty,
   objectToProperty,
   Property,
   PropertyType,
+  stringToDataType,
+  typeOfProperty,
   utf8ToBase64,
 } from '../src';
 
@@ -16,16 +19,19 @@ describe('test message utils', () => {
   it('test hash property', () => {
     const property1: Property = {
       key: 'a,b',
+      dataType: PropertyDataType.String,
       type: PropertyType.Raw,
       value: 'c',
     };
     const property2: Property = {
       key: 'a',
+      dataType: PropertyDataType.String,
       type: PropertyType.Raw,
       value: 'b,c',
     };
     const property3: Property = {
       key: '',
+      dataType: PropertyDataType.String,
       type: PropertyType.Hash,
       value: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     };
@@ -49,18 +55,101 @@ describe('test message utils', () => {
       {
         key: 'name',
         type: 'RAW',
+        dataType: PropertyDataType.String,
         value: 'Hyeock-Jin',
       },
       {
         key: 'age',
         type: 'RAW',
+        dataType: PropertyDataType.String,
         value: '25',
       },
       {
         key: 'address',
         type: 'RAW',
+        dataType: PropertyDataType.String,
         value: 'Daejeon',
       },
     ]);
+  });
+});
+
+describe('test data type', () => {
+  const stringProperty: Property = {
+    key: 'name',
+    dataType: PropertyDataType.String,
+    type: PropertyType.Raw,
+    value: 'Kim',
+  };
+  const numberProperty: Property = {
+    key: 'age',
+    dataType: PropertyDataType.Number,
+    type: PropertyType.Raw,
+    value: 25,
+  };
+  const dateProperty: Property = {
+    key: 'birth',
+    dataType: PropertyDataType.Date,
+    type: PropertyType.Raw,
+    value: new Date('1996-12-28'),
+  };
+  const booleanProperty: Property = {
+    key: 'isAdult',
+    dataType: PropertyDataType.Boolean,
+    type: PropertyType.Raw,
+    value: true,
+  };
+
+  it('test stringToDataType of string type', () => {
+    const stringValue = stringProperty.value;
+    expect(stringToDataType(stringValue, PropertyDataType.String)).to.be.equal(
+      stringValue,
+    );
+  });
+  it('test stringToDataType of number type', () => {
+    const numberValue = JSON.stringify(numberProperty.value);
+    expect(stringToDataType(numberValue, PropertyDataType.Number)).to.be.equal(
+      numberProperty.value,
+    );
+  });
+  it('test stringToDataType of date type', () => {
+    const dateValue = dateProperty.value;
+    expect(stringToDataType(dateValue, PropertyDataType.Date)).to.be.deep.equal(
+      dateProperty.value,
+    );
+  });
+  it('test stringToDataType of date type when it is string', () => {
+    const dateValue = JSON.stringify(dateProperty.value);
+    expect(stringToDataType(dateValue, PropertyDataType.Date)).to.be.deep.equal(
+      dateProperty.value,
+    );
+  });
+  it('test stringToDataType of boolean type', () => {
+    const booleanValue = booleanProperty.value;
+    expect(
+      stringToDataType(booleanValue, PropertyDataType.Boolean),
+    ).to.be.equal(booleanProperty.value);
+  });
+  it('test stringToDataType of boolean type when it is string', () => {
+    const booleanValue = JSON.stringify(booleanProperty.value);
+    expect(
+      stringToDataType(booleanValue, PropertyDataType.Boolean),
+    ).to.be.equal(booleanProperty.value);
+  });
+  it('test typeOfProperty of string type', () => {
+    const stringValue = stringProperty.value;
+    expect(typeOfProperty(stringValue)).to.be.equal(stringProperty.dataType);
+  });
+  it('test typeOfProperty of number type', () => {
+    const numberValue = numberProperty.value;
+    expect(typeOfProperty(numberValue)).to.be.equal(numberProperty.dataType);
+  });
+  it('test typeOfProperty of date type', () => {
+    const dateValue = dateProperty.value;
+    expect(typeOfProperty(dateValue)).to.be.equal(dateProperty.dataType);
+  });
+  it('test typeOfProperty of boolean type', () => {
+    const booleanValue = booleanProperty.value;
+    expect(typeOfProperty(booleanValue)).to.be.equal(booleanProperty.dataType);
   });
 });

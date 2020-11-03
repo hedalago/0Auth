@@ -17,12 +17,12 @@ export type Predicate<T> = Supplier<T, boolean>;
 export type KeySupplier<K, T, U> = (v1: K, v2: T) => U;
 
 export type RegisterInfo = {
-  validate: KeySupplier<string, Predicate<string>, RegisterInfo>;
+  validate: KeySupplier<string, Predicate<unknown>, RegisterInfo>;
   sign: KeySupplier<SecretKey, AuthType, Signature | null>;
 };
 
 export type SubmitInfo<T> = {
-  validate: KeySupplier<string, Predicate<string>, SubmitInfo<T>>;
+  validate: KeySupplier<string, Predicate<unknown>, SubmitInfo<T>>;
   confirm: Supplier<T, T | null>;
   supply: Supplier<() => T, T | null>;
 };
