@@ -1,4 +1,10 @@
-import { AuthType, KeyType, Signature } from '@0auth/message';
+import {
+  AuthType,
+  KeyType,
+  Predicate,
+  Signature,
+  Supplier,
+} from '@0auth/message';
 
 export type SecretKey = {
   type: KeyType;
@@ -9,10 +15,6 @@ export type PublicKey = {
   type: KeyType;
   key: string;
 };
-
-export type Supplier<T, U> = (value: T) => U;
-
-export type Predicate<T> = Supplier<T, boolean>;
 
 export type KeySupplier<K, T, U> = (v1: K, v2: T) => U;
 

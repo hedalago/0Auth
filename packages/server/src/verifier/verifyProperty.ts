@@ -1,6 +1,12 @@
-import { AuthType, Property, propertyObject, Signature } from '@0auth/message';
+import {
+  AuthType,
+  Predicate,
+  Property,
+  propertyObject,
+  Signature,
+} from '@0auth/message';
 
-import { SubmitInfo, Predicate, PublicKey } from '../type';
+import { SubmitInfo, PublicKey } from '../type';
 import { verifyByAuthType } from '@0auth/server';
 
 export function verifyProperty<T>(

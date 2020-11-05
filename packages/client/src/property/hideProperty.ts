@@ -8,6 +8,7 @@ export function hideProperty(
     hideNames.includes(property.key)
       ? {
           type: PropertyType.Hash,
+          dataType: property.dataType,
           key: property.key,
           value: hashProperty(property),
         }

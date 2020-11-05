@@ -8,16 +8,20 @@ import {
   Property,
   PropertyDataType,
   PropertyType,
+  Signature,
 } from '@0auth/message';
 import { authPrivacy, verifyPrivacy } from '@0auth/server';
 import {
   DataType,
   decryptMessage,
+  DynamicFormInput,
   encryptMessage,
+  extensionListener,
   getData,
   getDecryptedMessage,
   getSignature,
   hideProperty,
+  sendToExtension,
   StorageType,
   storeData,
   storeSignature,
@@ -242,5 +246,104 @@ describe('test hide property', () => {
     expect(
       verifyPrivacy(partiallyHiddenProperties, sign, publicKey),
     ).to.be.equal(true);
+  });
+});
+
+type Listener = (m: MessageEvent) => unknown;
+
+class MessageEvent {
+  data: { [key: string]: string } = {};
+  source: Window = window;
+
+  constructor(
+    type: string,
+    eventInitDict: { [key: string]: { [key: string]: string } },
+  ) {
+    if (type === 'message') {
+      this.data = eventInitDict.data;
+    }
+  }
+}
+
+function mockWindow(listenerQueue: Listener[]) {
+  return {
+    addEventListener: (type: string, listener: Listener, option: boolean) => {
+      if (type === 'message') {
+        listenerQueue.push(listener);
+        return option;
+      }
+    },
+    postMessage: (message: { [key: string]: string }, targetOrigin: string) => {
+      if (targetOrigin !== undefined) {
+        const event = new MessageEvent('message', { data: message });
+        listenerQueue.forEach((listener) => listener(event));
+      }
+    },
+  };
+}
+
+describe('test extension code', () => {
+  let listenerQueue: Listener[] = [];
+  if (global.window === undefined) {
+    Object.defineProperty(global, 'window', {
+      value: mockWindow(listenerQueue),
+    });
+  }
+  afterEach(() => {
+    listenerQueue = [];
+  });
+  it('test listener', () => {
+    extensionListener()
+      .add('FORM', (msg) => msg.form)
+      .add('PROPERTY', (msg) => msg.properties)
+      .add('SIGN', (msg) => msg.sign)
+      .listen();
+    expect(listenerQueue.length).to.be.equal(1);
+  });
+  it('test listen by extension message', () => {
+    let response:
+      | Property[]
+      | Signature
+      | DynamicFormInput[]
+      | undefined = undefined;
+    extensionListener()
+      .add('FORM', (msg) => {
+        response = msg.form;
+      })
+      .add('PROPERTY', (msg) => {
+        response = msg.properties;
+      })
+      .add('SIGN', (msg) => {
+        response = msg.sign;
+      })
+      .listen();
+    window.postMessage(
+      { from: 'content', type: 'FORM', message: { form: [1, 2, 3] } },
+      '*',
+    );
+    expect(response).to.be.not.undefined;
+    expect(response).to.be.deep.equal([1, 2, 3]);
+  });
+  it('test listen by website message', () => {
+    let response:
+      | Property[]
+      | Signature
+      | DynamicFormInput[]
+      | undefined = undefined;
+    extensionListener()
+      .add('FORM', (msg) => {
+        response = msg.form;
+      })
+      .listen();
+    sendToExtension('FORM', {
+      form: [
+        {
+          type: PropertyDataType.String,
+          label: 'name',
+          name: 'Name',
+        },
+      ],
+    });
+    expect(response).to.be.undefined;
   });
 });

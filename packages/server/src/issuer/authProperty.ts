@@ -1,6 +1,12 @@
-import { AuthType, Property, propertyObject, Signature } from '@0auth/message';
+import {
+  AuthType,
+  Predicate,
+  Property,
+  propertyObject,
+  Signature,
+} from '@0auth/message';
 
-import { Predicate, RegisterInfo, SecretKey } from '../type';
+import { RegisterInfo, SecretKey } from '../type';
 import { authByAuthType } from '@0auth/server';
 
 export function authProperty(properties: Property[]): RegisterInfo {

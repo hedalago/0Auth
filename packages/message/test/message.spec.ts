@@ -1,15 +1,17 @@
 import { expect } from 'chai';
 import {
-  PropertyDataType,
   hash,
   hashProperty,
   objectToProperty,
   Property,
+  PropertyDataType,
   PropertyType,
   stringToDataType,
   typeOfProperty,
   utf8ToBase64,
 } from '../src';
+import { defaultValue } from '../src/type/defaultValue';
+import { inputType } from '../src/type/inputType';
 
 describe('test message utils', () => {
   it('test utf8 to base64', () => {
@@ -151,5 +153,29 @@ describe('test data type', () => {
   it('test typeOfProperty of boolean type', () => {
     const booleanValue = booleanProperty.value;
     expect(typeOfProperty(booleanValue)).to.be.equal(booleanProperty.dataType);
+  });
+  it('test default value of string type', () => {
+    expect(defaultValue(PropertyDataType.String)).to.be.equal('');
+  });
+  it('test default value of number type', () => {
+    expect(defaultValue(PropertyDataType.Number)).to.be.equal(0);
+  });
+  it('test default value of date type', () => {
+    expect(defaultValue(PropertyDataType.Date) instanceof Date).to.be.true;
+  });
+  it('test default value of boolean type', () => {
+    expect(defaultValue(PropertyDataType.Boolean)).to.be.false;
+  });
+  it('test inputType of string type', () => {
+    expect(inputType(PropertyDataType.String)).to.be.equal('text');
+  });
+  it('test inputType of number type', () => {
+    expect(inputType(PropertyDataType.Number)).to.be.equal('number');
+  });
+  it('test inputType of date type', () => {
+    expect(inputType(PropertyDataType.Date)).to.be.equal('date');
+  });
+  it('test inputType of boolean type', () => {
+    expect(inputType(PropertyDataType.Boolean)).to.be.equal('checkbox');
   });
 });
