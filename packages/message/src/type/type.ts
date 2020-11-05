@@ -35,3 +35,7 @@ export type Signature = {
   keyType: KeyType;
   value: string;
 };
+
+export type Supplier<T, U> = (value: T) => U;
+
+export type Predicate<T> = Supplier<T, boolean>;
